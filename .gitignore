@@ -18,6 +18,7 @@ test-results/
 .DS_Store
 Thumbs.db
 .vscode/
+.vs/
 .idea/
 
 # Logs

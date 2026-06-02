@@ -157,3 +157,25 @@ Vì password Somee đã từng được gửi trong chat, nên sau khi web chạ
 3. Copy connection string mới.
 4. Cập nhật lại `ConnectionStrings__Default` trên Render.
 5. Redeploy/restart service.
+
+## 9. Cron keep-alive
+
+Sau khi có URL Render, tạo cron ping endpoint:
+
+```text
+https://<service-name>.onrender.com/health/db
+```
+
+Tần suất đề xuất:
+
+```text
+5-10 phút/lần
+```
+
+Endpoint này vừa đánh thức Render vừa query nhẹ vào Somee DB.
+
+Xem hướng dẫn chi tiết trong:
+
+```text
+CRON_KEEPALIVE.md
+```

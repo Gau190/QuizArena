@@ -31,7 +31,7 @@
         @foreach (var question in Model)
         {
             <article class="question-item">
-                <div class="q-index">Q@question.Id</div>
+                <div class="q-index">Q@(question.Id)</div>
                 <div>
                     <div class="q-tags">
                         <span class="badge">@question.Type</span>

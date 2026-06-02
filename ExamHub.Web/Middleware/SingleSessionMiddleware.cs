@@ -36,8 +36,9 @@ public class SingleSessionMiddleware(RequestDelegate next)
         }
 
         var extension = IsRemembered(context.User) ? TimeSpan.FromDays(14) : TimeSpan.FromMinutes(60);
+        var newExpiresAt = DateTime.UtcNow.Add(extension);
         await db.ActiveSessions.Where(x => x.UserId == userId).ExecuteUpdateAsync(setters =>
-            setters.SetProperty(x => x.ExpiresAt, DateTime.UtcNow.Add(extension)));
+            setters.SetProperty(x => x.ExpiresAt, newExpiresAt));
 
         await next(context);
     }

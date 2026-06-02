@@ -5,7 +5,8 @@ namespace ExamHub.Core.Models;
 
 public record LoginRequest(
     [Required, StringLength(50)] string Username,
-    [Required, StringLength(100)] string Password);
+    [Required, StringLength(100)] string Password,
+    bool RememberMe = false);
 
 public record AuthResult(
     Guid UserId,

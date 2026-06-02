@@ -10,10 +10,10 @@ namespace ExamHub.Infrastructure.Services;
 
 public class JwtTokenService(IConfiguration configuration)
 {
-    public (string Token, string Hash, DateTime ExpiresAt) Create(User user)
+    public (string Token, string Hash, DateTime ExpiresAt) Create(User user, bool rememberMe = false)
     {
         var expiry = int.TryParse(configuration["Jwt:ExpiryMinutes"], out var parsedExpiry) ? parsedExpiry : 60;
-        var expiresAt = DateTime.UtcNow.AddMinutes(expiry);
+        var expiresAt = rememberMe ? DateTime.UtcNow.AddDays(14) : DateTime.UtcNow.AddMinutes(expiry);
         var secret = string.IsNullOrWhiteSpace(configuration["Jwt:Secret"])
             ? Environment.GetEnvironmentVariable("JWT_SECRET")
             : configuration["Jwt:Secret"];
@@ -26,6 +26,7 @@ public class JwtTokenService(IConfiguration configuration)
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new Claim(ClaimTypes.Name, user.Username),
             new Claim("full_name", user.FullName),
+            new Claim("remember_me", rememberMe ? "true" : "false"),
             new Claim(ClaimTypes.Role, user.Role.ToString())
         };
 

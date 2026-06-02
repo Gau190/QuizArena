@@ -32,9 +32,13 @@ public class SingleSessionMiddleware(RequestDelegate next)
             return;
         }
 
+        var extension = IsRemembered(context.User) ? TimeSpan.FromDays(14) : TimeSpan.FromMinutes(60);
         await db.ActiveSessions.Where(x => x.UserId == userId).ExecuteUpdateAsync(setters =>
-            setters.SetProperty(x => x.ExpiresAt, DateTime.UtcNow.AddMinutes(60)));
+            setters.SetProperty(x => x.ExpiresAt, DateTime.UtcNow.Add(extension)));
 
         await next(context);
     }
+
+    private static bool IsRemembered(ClaimsPrincipal user) =>
+        string.Equals(user.FindFirstValue("remember_me"), "true", StringComparison.OrdinalIgnoreCase);
 }

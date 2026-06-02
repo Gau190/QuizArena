@@ -21,9 +21,9 @@ public class HomeController : Controller
         var role = User.FindFirstValue(ClaimTypes.Role);
         return role switch
         {
-            "Admin" => LocalRedirect("/admin/dashboard"),
-            "Teacher" => RedirectToAction("Questions", "Teacher"),
-            "Student" => RedirectToAction("Dashboard", "Student"),
+            "Admin" => LocalRedirect("/admin"),
+            "Teacher" => LocalRedirect("/teacher"),
+            "Student" => LocalRedirect("/student"),
             _ => RedirectToAction("Login", "Account")
         };
     }

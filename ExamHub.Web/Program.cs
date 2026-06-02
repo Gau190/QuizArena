@@ -73,7 +73,7 @@ if (!app.Environment.IsDevelopment())
 app.Use(async (ctx, next) =>
 {
     ctx.Response.Headers.Append("Content-Security-Policy",
-        "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' https://cdn.jsdelivr.net data:");
+        "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data:; font-src 'self' https://cdn.jsdelivr.net data:");
     await next();
 });
 

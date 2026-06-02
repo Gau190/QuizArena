@@ -16,7 +16,7 @@ public class AuthService(ExamHubDbContext db, JwtTokenService tokenService) : IA
             return null;
         }
 
-        var token = tokenService.Create(user);
+        var token = tokenService.Create(user, request.RememberMe);
         var session = await db.ActiveSessions.FindAsync([user.Id], cancellationToken);
         if (session is null)
         {

@@ -1,0 +1,52 @@
+@model IReadOnlyList<User>
+@{
+    ViewData["Title"] = "Quản lý người dùng";
+}
+
+<section class="panel">
+    <div class="panel-head">
+        <h1>Quản lý người dùng</h1>
+        <form class="toolbar" method="get">
+            <input name="q" value="@Context.Request.Query["q"]" placeholder="Tìm theo tên, username..." />
+            <select name="role">
+                <option value="">Tất cả vai trò</option>
+                <option value="Admin">Admin</option>
+                <option value="Teacher">Giáo viên</option>
+                <option value="Student">Thí sinh</option>
+            </select>
+            <button class="btn ghost" type="submit">Lọc</button>
+        </form>
+    </div>
+
+    <form class="inline-form" method="post" asp-action="CreateUser">
+        @Html.AntiForgeryToken()
+        <input name="username" placeholder="Username" required />
+        <input name="fullName" placeholder="Họ tên" required />
+        <input name="email" type="email" placeholder="Email" required />
+        <input name="password" type="password" placeholder="Mật khẩu" required />
+        <select name="role" asp-items="Html.GetEnumSelectList<UserRole>()"></select>
+        <button class="btn primary" type="submit">Thêm người dùng</button>
+    </form>
+
+    <table class="data-table">
+        <thead><tr><th>Người dùng</th><th>Username</th><th>Vai trò</th><th>Trạng thái</th><th>Đăng nhập cuối</th><th></th></tr></thead>
+        <tbody>
+        @foreach (var user in Model)
+        {
+            <tr>
+                <td><div class="person"><span class="avatar">@user.FullName.Split(' ').Last()[0]</span><div><b>@user.FullName</b><small>@user.Email</small></div></div></td>
+                <td>@user.Username</td>
+                <td><span class="badge @user.Role.ToString().ToLowerInvariant()">@user.Role</span></td>
+                <td><span class="status @(user.IsActive ? "ok" : "danger")"></span>@(user.IsActive ? "Hoạt động" : "Bị khóa")</td>
+                <td>@(user.LastLoginAt?.ToLocalTime().ToString("dd/MM/yyyy HH:mm") ?? "Chưa có")</td>
+                <td>
+                    <form method="post" asp-action="ToggleUser" asp-route-id="@user.Id">
+                        @Html.AntiForgeryToken()
+                        <button class="icon-btn" type="submit">@(user.IsActive ? "Khóa" : "Mở")</button>
+                    </form>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</section>

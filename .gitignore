@@ -1,0 +1,32 @@
+# Build outputs
+bin/
+obj/
+publish/
+TestResults/
+test-results/
+
+# User/local settings
+.env
+.env.*
+!.env.example
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# OS/editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# NuGet/cache
+*.nupkg
+packages/
+
+# Secrets
+secrets.json
+appsettings.Production.json

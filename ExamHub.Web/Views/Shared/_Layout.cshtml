@@ -1,0 +1,51 @@
+@using System.Security.Claims
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - ExamHub</title>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    @{
+        var role = User.FindFirstValue(ClaimTypes.Role);
+        var name = User.FindFirstValue("full_name") ?? User.Identity?.Name;
+        var initials = string.Join("", (name ?? "EH").Split(' ', StringSplitOptions.RemoveEmptyEntries).TakeLast(2).Select(x => x[0])).ToUpperInvariant();
+    }
+    @if (User.Identity?.IsAuthenticated == true)
+    {
+        <nav class="navbar">
+            <a class="nav-logo" asp-controller="Home" asp-action="Index"><span class="nav-mark">EH</span>ExamHub</a>
+            <div class="nav-links">
+                @if (role == "Admin")
+                {
+                    <a asp-controller="Admin" asp-action="Users">Người dùng</a>
+                    <a asp-controller="Admin" asp-action="Subjects">Môn thi</a>
+                }
+                @if (role == "Teacher")
+                {
+                    <a asp-controller="Teacher" asp-action="Questions">Ngân hàng câu hỏi</a>
+                    <a asp-controller="Teacher" asp-action="CreateExam">Tạo kỳ thi</a>
+                    <a asp-controller="Teacher" asp-action="Results">Kết quả</a>
+                }
+                @if (role == "Student")
+                {
+                    <a asp-controller="Student" asp-action="Dashboard">Bảng điều khiển</a>
+                }
+            </div>
+            <form asp-controller="Account" asp-action="Logout" method="post" class="nav-user">
+                @Html.AntiForgeryToken()
+                <span class="avatar">@initials</span>
+                <span>@name</span>
+                <button class="link-btn" type="submit">Đăng xuất</button>
+            </form>
+        </nav>
+    }
+    <main class="container">
+        @RenderBody()
+    </main>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

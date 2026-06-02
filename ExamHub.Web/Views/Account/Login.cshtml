@@ -1,0 +1,34 @@
+@model LoginRequest
+@{
+    ViewData["Title"] = "Đăng nhập";
+}
+
+<section class="login-page">
+    <form class="login-card" method="post" asp-action="Login">
+        @Html.AntiForgeryToken()
+        <div class="brand-row"><span class="brand-icon">EH</span><span class="brand-name">ExamHub</span></div>
+        <p class="subtitle">Nhập tài khoản, hệ thống tự chuyển hướng theo vai trò</p>
+
+        @if (ViewBag.Error is string error)
+        {
+            <div class="alert danger">@error</div>
+        }
+
+        <label class="field">
+            <span>Tên đăng nhập</span>
+            <input asp-for="Username" autocomplete="username" placeholder="Nhập username..." />
+        </label>
+        <label class="field">
+            <span>Mật khẩu</span>
+            <input asp-for="Password" type="password" autocomplete="current-password" placeholder="Nhập mật khẩu..." />
+        </label>
+        <button class="btn primary full" type="submit">Đăng nhập</button>
+        <p class="hint">Quên mật khẩu? Liên hệ quản trị viên của tổ chức.</p>
+
+        <div class="role-preview">
+            <div><b>Admin</b><span>/admin/dashboard</span></div>
+            <div><b>Giáo viên</b><span>/teacher/questions</span></div>
+            <div><b>Thí sinh</b><span>/student/dashboard</span></div>
+        </div>
+    </form>
+</section>

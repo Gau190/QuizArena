@@ -1,0 +1,55 @@
+@using System.Text.Json
+@model ExamAttempt
+@{
+    ViewData["Title"] = "Kết quả bài thi";
+    var totalQuestions = Model.Answers.Count;
+    var correct = Model.Answers.Count(x => x.IsCorrect == true);
+    var score = Model.Score ?? 0;
+    var total = Model.TotalPoints ?? 10;
+}
+
+<section class="result-panel">
+    <div class="result-head">
+        <div>
+            <h1>@Model.Exam?.Title</h1>
+            <p>@Model.Exam?.Subject?.Name · @Model.SubmittedAt?.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</p>
+        </div>
+        <a class="btn ghost" asp-action="Dashboard">Về trang chủ</a>
+    </div>
+    <div class="score-hero">
+        <div class="score-circle"><b>@score.ToString("0.0")</b><span>/ @total.ToString("0.#")</span></div>
+        <div class="meta-grid">
+            <div><span>Câu đúng</span><b class="green">@correct / @totalQuestions</b></div>
+            <div><span>Câu sai</span><b class="red">@(totalQuestions - correct) / @totalQuestions</b></div>
+            <div><span>Thời gian làm</span><b>@(((Model.SubmittedAt ?? DateTime.UtcNow) - Model.StartedAt).TotalMinutes.ToString("0")) phút</b></div>
+            <div><span>Trạng thái</span><b>@Model.Status</b></div>
+        </div>
+    </div>
+    <div class="result-list">
+        @foreach (var answer in Model.Answers.OrderBy(x => x.Id))
+        {
+            var selected = JsonSerializer.Deserialize<List<int>>(answer.AnswerIds ?? "[]") ?? [];
+            <article class="result-item">
+                <div class="result-icon @(answer.IsCorrect == true ? "ok" : "bad")">@(answer.IsCorrect == true ? "✓" : "×")</div>
+                <div>
+                    <div class="muted">@answer.Question?.Type · @((answer.PointsEarned ?? 0).ToString("0.##")) điểm</div>
+                    <h3>@answer.Question?.Content</h3>
+                    <div class="answers">
+                        @if (answer.Question?.Type == QuestionType.TextAnswer)
+                        {
+                            <span class="answer @(answer.IsCorrect == true ? "correct" : "wrong")">Đáp án của bạn: @answer.TextInput</span>
+                            <span class="answer correct">Đáp án đúng: @string.Join(", ", answer.Question.Answers.Where(x => x.IsCorrect).Select(x => x.Content))</span>
+                        }
+                        else if (answer.Question is not null)
+                        {
+                            @foreach (var option in answer.Question.Answers)
+                            {
+                                <span class="answer @(option.IsCorrect ? "correct" : selected.Contains(option.Id) ? "wrong" : "")">@option.Content @(option.IsCorrect ? "✓" : selected.Contains(option.Id) ? "đã chọn" : "")</span>
+                            }
+                        }
+                    </div>
+                </div>
+            </article>
+        }
+    </div>
+</section>

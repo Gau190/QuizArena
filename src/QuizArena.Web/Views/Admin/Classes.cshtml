@@ -1,0 +1,164 @@
+@model ClassManagementViewModel
+@{
+    ViewData["Title"] = "Quản lý lớp học";
+}
+
+<section class="feature-shell">
+    <div class="feature-head">
+        <div>
+            <h1>Lớp học</h1>
+            <p>Tạo lớp, phân công giáo viên chủ nhiệm và theo dõi danh sách học sinh.</p>
+        </div>
+        <div class="head-actions">
+            <button class="btn primary" type="submit" form="create-class-form"><i class="fa-solid fa-plus"></i> Tạo lớp</button>
+        </div>
+    </div>
+
+    @if (TempData["AdminMessage"] is string message)
+    {
+        <div class="alert info">@message</div>
+    }
+
+    <form id="create-class-form" class="inline-form" method="post" asp-action="CreateClass">
+        @Html.AntiForgeryToken()
+        <input name="name" placeholder="Tên lớp, ví dụ 12A1" required />
+        <select name="grade" required>
+            <option value="">Khối</option>
+            <option>10</option>
+            <option>11</option>
+            <option>12</option>
+        </select>
+        <select name="track">
+            <option value="">Ban học</option>
+            <option>Cơ bản</option>
+            <option>Khoa học tự nhiên</option>
+            <option>Khoa học xã hội</option>
+            <option>Tiếng Anh tăng cường</option>
+            <option>Ôn thi tốt nghiệp</option>
+        </select>
+        <select name="homeTeacherId">
+            <option value="">Chưa phân công GVCN</option>
+            @foreach (var teacher in Model.Teachers)
+            {
+                <option value="@teacher.Id">@teacher.FullName</option>
+            }
+        </select>
+        <select name="room">
+            <option value="">Phòng học</option>
+            @foreach (var room in new[] { "Phòng 201", "Phòng 202", "Phòng 251", "Phòng 252", "Phòng 301", "Phòng 302", "Phòng Lab 1", "Phòng Lab 2" })
+            {
+                <option>@room</option>
+            }
+        </select>
+        <input name="maxStudents" type="number" min="1" max="80" value="45" aria-label="Sĩ số tối đa" />
+    </form>
+
+    <form class="inline-form" method="post" asp-action="ImportClasses" enctype="multipart/form-data">
+        @Html.AntiForgeryToken()
+        <input type="file" name="file" accept=".csv,text/csv" required />
+        <span class="muted">CSV: username, fullName, email, role, className, password</span>
+        <button class="btn ghost" type="submit"><i class="fa-solid fa-upload"></i> Import CSV</button>
+    </form>
+
+    <form class="filters-strip" method="get">
+        <input name="q" value="@Context.Request.Query["q"]" placeholder="Tìm học sinh..." />
+        <select name="grade"><option value="">Tất cả khối</option><option>Khối 12</option><option>Khối 11</option><option>Khối 10</option></select>
+        <select name="academicYearId">
+            @foreach (var year in Model.AcademicYears)
+            {
+                <option value="@year.Id" selected="@(year.Id == Model.CurrentAcademicYearId)">@year.Name</option>
+            }
+        </select>
+        <button class="btn ghost" type="submit">Lọc</button>
+    </form>
+
+    <div class="class-grid">
+        @foreach (var item in Model.Classes)
+        {
+            <article class="class-card @(item.IsSelected ? "selected" : "")">
+                <div>
+                    <h2>@item.Name</h2>
+                    <p>GVCN: @item.HomeTeacher · @item.Room · @item.Track</p>
+                </div>
+                <div class="class-stats">
+                    <b>@item.StudentCount <span>học sinh</span></b>
+                    <b class="blue">@item.AverageScore.ToString("0.0") <span>điểm TB</span></b>
+                </div>
+                <form class="compact-edit-form" method="post" asp-action="UpdateClass" asp-route-id="@item.Id">
+                    @Html.AntiForgeryToken()
+                    <input name="name" value="@item.Name" required />
+                    <select name="grade">
+                        @foreach (var grade in new[] { "10", "11", "12" })
+                        {
+                            <option selected="@(grade == item.Grade)">@grade</option>
+                        }
+                    </select>
+                    <select name="track">
+                        @foreach (var track in new[] { "Cơ bản", "Khoa học tự nhiên", "Khoa học xã hội", "Tiếng Anh tăng cường", "Ôn thi tốt nghiệp" })
+                        {
+                            <option selected="@(track == item.Track)">@track</option>
+                        }
+                    </select>
+                    <select name="homeTeacherId">
+                        <option value="">Chưa phân công</option>
+                        @foreach (var teacher in Model.Teachers)
+                        {
+                            <option value="@teacher.Id" selected="@(teacher.Id == item.HomeTeacherId)">@teacher.FullName</option>
+                        }
+                    </select>
+                    <select name="room">
+                        @foreach (var room in new[] { "Phòng 201", "Phòng 202", "Phòng 251", "Phòng 252", "Phòng 301", "Phòng 302", "Phòng Lab 1", "Phòng Lab 2" })
+                        {
+                            <option selected="@(room == item.Room)">@room</option>
+                        }
+                    </select>
+                    <input name="maxStudents" type="number" min="1" max="80" value="@item.MaxStudents" />
+                    <button class="btn ghost" type="submit"><i class="fa-solid fa-floppy-disk"></i> Lưu</button>
+                </form>
+                <form method="post" asp-action="DeleteClass" asp-route-id="@item.Id">
+                    @Html.AntiForgeryToken()
+                    <button class="btn ghost danger" type="submit"><i class="fa-solid fa-trash"></i> Xóa lớp</button>
+                </form>
+            </article>
+        }
+    </div>
+
+    <section class="panel">
+        <div class="panel-head tight">
+            <h2>Danh sách học sinh theo lớp</h2>
+            <div class="head-actions">
+                <a class="btn ghost" asp-action="ExportClasses"><i class="fa-solid fa-file-excel"></i> Xuất Excel</a>
+                <a class="btn primary" asp-action="Users"><i class="fa-solid fa-user-plus"></i> Thêm học sinh</a>
+            </div>
+        </div>
+        <table class="data-table">
+            <thead><tr><th>Học sinh</th><th>Mã HS</th><th>Email</th><th>Lớp hiện tại</th><th>Chuyển lớp</th><th>Trạng thái</th><th></th></tr></thead>
+            <tbody>
+            @foreach (var row in Model.Students)
+            {
+                <tr>
+                    <td><div class="person"><span class="avatar">@row.Student.FullName.Split(' ').Last()[0]</span><div><b>@row.Student.FullName</b><small>@row.Student.Username</small></div></div></td>
+                    <td>@row.StudentCode</td>
+                    <td>@row.Student.Email</td>
+                    <td>@row.ClassName</td>
+                    <td>
+                        <form class="table-inline-form" method="post" asp-action="TransferStudent">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="studentId" value="@row.Student.Id" />
+                            <select name="classId">
+                                @foreach (var item in Model.Classes)
+                                {
+                                    <option value="@item.Id" selected="@(item.Id == row.ClassId)">@item.Name</option>
+                                }
+                            </select>
+                            <button class="btn ghost" type="submit">Chuyển</button>
+                        </form>
+                    </td>
+                    <td><span class="status @(row.IsActive ? "ok" : "danger")"></span>@(row.IsActive ? "Đang học" : "Tạm khóa")</td>
+                    <td><a class="icon-btn" asp-controller="School" asp-action="StudentProfile" asp-route-id="@row.Student.Id">Hồ sơ</a></td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </section>
+</section>

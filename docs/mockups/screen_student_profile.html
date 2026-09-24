@@ -1,0 +1,163 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:var(--font-sans)}
+.pw{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden}
+.ph{display:grid;grid-template-columns:auto 1fr auto;gap:20px;align-items:center;padding:20px 24px;border-bottom:0.5px solid var(--color-border-tertiary);background:var(--color-background-secondary)}
+.av{width:64px;height:64px;border-radius:50%;background:#EFF6FF;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:500;color:#2563EB;flex-shrink:0}
+.pname{font-size:17px;font-weight:500;color:var(--color-text-primary);margin-bottom:3px}
+.pmeta{font-size:12px;color:var(--color-text-secondary);display:flex;gap:12px;flex-wrap:wrap}
+.pmeta span{display:flex;align-items:center;gap:4px}
+.pbadge{font-size:11px;padding:3px 10px;border-radius:20px;font-weight:500}
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:0.5px solid var(--color-border-tertiary)}
+.sc{padding:14px 16px;border-right:0.5px solid var(--color-border-tertiary);text-align:center}
+.sc:last-child{border-right:none}
+.sc-num{font-size:20px;font-weight:500;color:var(--color-text-primary)}
+.sc-label{font-size:11px;color:var(--color-text-secondary);margin-top:2px}
+.tabs{display:flex;border-bottom:0.5px solid var(--color-border-tertiary)}
+.tab{font-size:13px;padding:10px 18px;cursor:pointer;color:var(--color-text-secondary);border-bottom:2px solid transparent;margin-bottom:-0.5px}
+.tab.active{color:#2563EB;border-bottom-color:#2563EB;font-weight:500}
+.body{display:grid;grid-template-columns:1fr 220px;gap:0}
+.main{padding:20px 24px;border-right:0.5px solid var(--color-border-tertiary)}
+.side{padding:20px}
+.sec{font-size:11px;font-weight:500;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px}
+.chart-wrap{height:120px;display:flex;align-items:flex-end;gap:6px;padding:0 4px;border-bottom:0.5px solid var(--color-border-tertiary);margin-bottom:8px}
+.bar-g{display:flex;flex-direction:column;align-items:center;gap:4px;flex:1}
+.bar{width:100%;border-radius:4px 4px 0 0;background:#3B82F6;transition:height .3s}
+.bar-label{font-size:10px;color:var(--color-text-secondary)}
+.bar-val{font-size:10px;font-weight:500;color:var(--color-text-primary)}
+.xaxis{display:flex;gap:6px;padding:0 4px;margin-bottom:16px}
+.xl{flex:1;font-size:10px;color:var(--color-text-secondary);text-align:center}
+.row-item{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:0.5px solid var(--color-border-tertiary)}
+.row-item:last-child{border-bottom:none}
+.ri-subj{flex:1}
+.ri-name{font-size:13px;color:var(--color-text-primary);font-weight:500}
+.ri-meta{font-size:11px;color:var(--color-text-secondary);margin-top:2px}
+.ri-score{font-size:14px;font-weight:500;min-width:36px;text-align:right}
+.pb-bg{height:4px;background:var(--color-background-secondary);border-radius:2px;overflow:hidden;width:70px}
+.pb-fill{height:100%;border-radius:2px}
+.info-item{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:0.5px solid var(--color-border-tertiary);font-size:13px}
+.info-item:last-child{border-bottom:none}
+.info-label{color:var(--color-text-secondary)}
+.info-val{color:var(--color-text-primary);font-weight:500}
+</style>
+<h2 class="sr-only">Hồ sơ học sinh với biểu đồ tiến bộ và lịch sử thi</h2>
+<div class="pw">
+  <div class="ph">
+    <div class="av">NT</div>
+    <div>
+      <div class="pname">Nguyễn Thí Sinh</div>
+      <div class="pmeta">
+        <span><i class="ti ti-building-school" style="font-size:13px" aria-hidden="true"></i>Lớp 11A2</span>
+        <span><i class="ti ti-calendar" style="font-size:13px" aria-hidden="true"></i>Niên khóa 2025–2026</span>
+        <span><i class="ti ti-id-badge" style="font-size:13px" aria-hidden="true"></i>HS2024001</span>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+      <span class="pbadge" style="background:#DCFCE7;color:#166534">Học lực: Giỏi</span>
+      <span class="pbadge" style="background:#EFF6FF;color:#1E3A8A">Hạnh kiểm: Tốt</span>
+    </div>
+  </div>
+
+  <div class="stat-row">
+    <div class="sc"><div class="sc-num" style="color:#2563EB">8.4</div><div class="sc-label">Điểm TB</div></div>
+    <div class="sc"><div class="sc-num">12</div><div class="sc-label">Bài đã thi</div></div>
+    <div class="sc"><div class="sc-num" style="color:#16A34A">92%</div><div class="sc-label">Tỷ lệ đạt</div></div>
+    <div class="sc"><div class="sc-num" style="color:#C2410C">#3</div><div class="sc-label">Xếp hạng lớp</div></div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active">Tiến bộ & Điểm</div>
+    <div class="tab">Thông tin cá nhân</div>
+    <div class="tab">Hoạt động gần đây</div>
+  </div>
+
+  <div class="body">
+    <div class="main">
+      <div class="sec">Biểu đồ điểm theo tháng</div>
+      <div class="chart-wrap">
+        <div class="bar-g"><div class="bar-val">7.2</div><div class="bar" style="height:62%"></div></div>
+        <div class="bar-g"><div class="bar-val">7.8</div><div class="bar" style="height:68%"></div></div>
+        <div class="bar-g"><div class="bar-val">8.0</div><div class="bar" style="height:72%;background:#22C55E"></div></div>
+        <div class="bar-g"><div class="bar-val">7.5</div><div class="bar" style="height:65%"></div></div>
+        <div class="bar-g"><div class="bar-val">8.5</div><div class="bar" style="height:78%;background:#22C55E"></div></div>
+        <div class="bar-g"><div class="bar-val">9.2</div><div class="bar" style="height:90%;background:#3B82F6"></div></div>
+      </div>
+      <div class="xaxis">
+        <div class="xl">Th.1</div><div class="xl">Th.2</div><div class="xl">Th.3</div>
+        <div class="xl">Th.4</div><div class="xl">Th.5</div><div class="xl">Th.6</div>
+      </div>
+      <div class="sec">Điểm theo môn học</div>
+      <div>
+        <div class="row-item">
+          <div class="ri-subj">
+            <div class="ri-name">Đại số tuyến tính</div>
+            <div class="ri-meta">3 lần thi · gần nhất: 02/06/2026</div>
+          </div>
+          <div class="pb-bg"><div class="pb-fill" style="width:92%;background:#3B82F6"></div></div>
+          <div class="ri-score" style="color:#2563EB">9.2</div>
+        </div>
+        <div class="row-item">
+          <div class="ri-subj">
+            <div class="ri-name">Lập trình Web</div>
+            <div class="ri-meta">2 lần thi · gần nhất: 28/05/2026</div>
+          </div>
+          <div class="pb-bg"><div class="pb-fill" style="width:85%;background:#22C55E"></div></div>
+          <div class="ri-score" style="color:#16A34A">8.5</div>
+        </div>
+        <div class="row-item">
+          <div class="ri-subj">
+            <div class="ri-name">Vật lý đại cương</div>
+            <div class="ri-meta">4 lần thi · gần nhất: 20/05/2026</div>
+          </div>
+          <div class="pb-bg"><div class="pb-fill" style="width:74%;background:#F97316"></div></div>
+          <div class="ri-score" style="color:#C2410C">7.4</div>
+        </div>
+        <div class="row-item">
+          <div class="ri-subj">
+            <div class="ri-name">Hóa học hữu cơ</div>
+            <div class="ri-meta">2 lần thi · gần nhất: 15/05/2026</div>
+          </div>
+          <div class="pb-bg"><div class="pb-fill" style="width:68%;background:#F97316"></div></div>
+          <div class="ri-score" style="color:#C2410C">6.8</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="side">
+      <div class="sec">Thông tin</div>
+      <div>
+        <div class="info-item"><span class="info-label">Ngày sinh</span><span class="info-val">15/08/2009</span></div>
+        <div class="info-item"><span class="info-label">Giới tính</span><span class="info-val">Nam</span></div>
+        <div class="info-item"><span class="info-label">GVCN</span><span class="info-val">Trần Văn Giáo</span></div>
+        <div class="info-item"><span class="info-label">Số buổi thi</span><span class="info-val">12</span></div>
+        <div class="info-item"><span class="info-label">Vi phạm</span><span class="info-val" style="color:#16A34A">0 lần</span></div>
+      </div>
+
+      <div class="sec" style="margin-top:20px">So sánh với lớp</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px">
+            <span style="color:var(--color-text-secondary)">Học sinh này</span>
+            <span style="color:#2563EB;font-weight:500">8.4</span>
+          </div>
+          <div style="height:6px;background:var(--color-background-secondary);border-radius:3px;overflow:hidden">
+            <div style="width:84%;height:100%;background:#3B82F6;border-radius:3px"></div>
+          </div>
+        </div>
+        <div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px">
+            <span style="color:var(--color-text-secondary)">Trung bình lớp</span>
+            <span style="color:var(--color-text-secondary)">7.1</span>
+          </div>
+          <div style="height:6px;background:var(--color-background-secondary);border-radius:3px;overflow:hidden">
+            <div style="width:71%;height:100%;background:var(--color-border-secondary);border-radius:3px"></div>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:20px">
+        <button style="width:100%;padding:8px;font-size:12px;font-weight:500;background:#2563EB;color:#EFF6FF;border:none;border-radius:var(--border-radius-md);cursor:pointer;font-family:var(--font-sans);display:flex;align-items:center;justify-content:center;gap:6px"><i class="ti ti-file-text" style="font-size:14px" aria-hidden="true"></i>Xuất học bạ PDF</button>
+      </div>
+    </div>
+  </div>
+</div>

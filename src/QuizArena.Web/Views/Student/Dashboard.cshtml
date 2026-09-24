@@ -1,0 +1,376 @@
+@using QuizArena.Core.Entities
+@using QuizArena.Core.Enums
+@model IReadOnlyList<Exam>
+@{
+    ViewData["Title"] = "Bảng điều khiển thí sinh";
+    var attempts = (IReadOnlyList<ExamAttempt>)ViewBag.Attempts;
+    var profile = ViewBag.Profile as StudentProfile;
+    var myClass = ViewBag.MyClass as SchoolClass;
+
+    var completed = attempts.Count(x => x.Score != null);
+    var avg = completed == 0 ? 0m : Math.Round(attempts.Where(x => x.Score != null && x.TotalPoints is > 0).Average(x => x.Score!.Value / x.TotalPoints!.Value * 10), 1);
+    var passRate = completed == 0 ? 0 : (int)Math.Round(attempts.Count(x => x.Score != null && x.TotalPoints is > 0 && x.Score / x.TotalPoints * 10 >= 5m) * 100.0 / completed);
+    var attemptsByExam = attempts.GroupBy(x => x.ExamId).ToDictionary(x => x.Key, x => x.ToList());
+
+    var violationCount = (int)(ViewBag.ViolationCount ?? 0);
+    var classRank = (int)(ViewBag.ClassRank ?? 0);
+    var classSize = (int)(ViewBag.ClassSize ?? 0);
+    decimal classAvg = ViewBag.ClassAvg ?? 0m;
+    decimal myAvg = ViewBag.MyAvg ?? avg;
+    const decimal maxScore = 10m;
+
+    var fullName = User.FindFirst("full_name")?.Value ?? "Học sinh";
+    var initials = string.Join("", fullName.Split(' ', StringSplitOptions.RemoveEmptyEntries).TakeLast(2).Select(x => x[0])).ToUpperInvariant();
+
+    var monthlyRaw = ViewBag.MonthlyScores as IList<object> ?? new List<object>();
+    var subjectRaw = ViewBag.SubjectScores as IList<object> ?? new List<object>();
+
+    // Email từ User claim (nếu có)
+    var userEmail = User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value ?? "";
+}
+
+<div class="stdp-wrap">
+
+    <!-- ========== LEFT SIDEBAR ========== -->
+    <aside class="stdp-sidebar">
+        <!-- Avatar + Name -->
+        <div class="stdp-av">@initials</div>
+        <div class="stdp-name">@fullName</div>
+        <div class="stdp-sub">
+            @(myClass != null ? $"Lớp {myClass.Name}" : "—")
+            @if (!string.IsNullOrEmpty(profile?.StudentCode))
+            { <span> · @profile.StudentCode</span> }
+        </div>
+
+        <!-- Badges -->
+        <div class="stdp-badges">
+            <span class="stdp-badge-level">Học lực: @(profile?.AcademicLevel ?? "Giỏi")</span>
+            <span class="stdp-badge-conduct">Hạnh kiểm: @(profile?.Conduct ?? "Tốt")</span>
+        </div>
+
+        <!-- Info rows -->
+        <div class="stdp-info-rows">
+            @if (profile?.DateOfBirth != null)
+            {
+                <div class="stdp-info-row">
+                    <i class="fa-regular fa-calendar stdp-info-icon"></i>
+                    <div>
+                        <div class="stdp-info-lbl">Ngày sinh</div>
+                        <div class="stdp-info-val">@profile.DateOfBirth.Value.ToString("dd/MM/yyyy")</div>
+                    </div>
+                </div>
+            }
+            @if (!string.IsNullOrEmpty(profile?.StudentCode))
+            {
+                <div class="stdp-info-row">
+                    <i class="fa-solid fa-id-badge stdp-info-icon"></i>
+                    <div>
+                        <div class="stdp-info-lbl">Mã HS</div>
+                        <div class="stdp-info-val">@profile.StudentCode</div>
+                    </div>
+                </div>
+            }
+            @if (myClass?.Organization != null || myClass != null)
+            {
+                <div class="stdp-info-row">
+                    <i class="fa-solid fa-school stdp-info-icon"></i>
+                    <div>
+                        <div class="stdp-info-lbl">Trường</div>
+                        <div class="stdp-info-val">THPT Chu Văn An</div>
+                    </div>
+                </div>
+            }
+            @if (!string.IsNullOrEmpty(userEmail))
+            {
+                <div class="stdp-info-row">
+                    <i class="fa-regular fa-envelope stdp-info-icon"></i>
+                    <div>
+                        <div class="stdp-info-lbl">Email</div>
+                        <div class="stdp-info-val stdp-email">@userEmail</div>
+                    </div>
+                </div>
+            }
+            @if (!string.IsNullOrEmpty(profile?.ParentPhone))
+            {
+                <div class="stdp-info-row">
+                    <i class="fa-solid fa-phone stdp-info-icon"></i>
+                    <div>
+                        <div class="stdp-info-lbl">SĐT phụ huynh</div>
+                        <div class="stdp-info-val">@profile.ParentPhone</div>
+                    </div>
+                </div>
+            }
+            @if (!string.IsNullOrEmpty(profile?.ParentName))
+            {
+                <div class="stdp-info-row">
+                    <i class="fa-solid fa-user stdp-info-icon"></i>
+                    <div>
+                        <div class="stdp-info-lbl">Phụ huynh</div>
+                        <div class="stdp-info-val">@profile.ParentName</div>
+                    </div>
+                </div>
+            }
+            @if (myClass?.HomeTeacher != null)
+            {
+                <div class="stdp-info-row">
+                    <i class="fa-solid fa-chalkboard-user stdp-info-icon"></i>
+                    <div>
+                        <div class="stdp-info-lbl">GVCN</div>
+                        <div class="stdp-info-val">@myClass.HomeTeacher.FullName</div>
+                    </div>
+                </div>
+            }
+            <div class="stdp-info-row">
+                <i class="fa-solid fa-triangle-exclamation stdp-info-icon"></i>
+                <div>
+                    <div class="stdp-info-lbl">Vi phạm</div>
+                    <div class="stdp-info-val" style="color:@(violationCount == 0 ? "var(--success)" : "var(--danger)")">@violationCount lần</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Export button -->
+        <div class="stdp-export-wrap">
+            <a class="stdp-export-btn" asp-controller="School" asp-action="Transcript">
+                <i class="fa-solid fa-file-lines"></i> Xem học bạ
+            </a>
+        </div>
+    </aside>
+
+    <!-- ========== RIGHT MAIN ========== -->
+    <div class="stdp-main">
+
+        @if (TempData["StudentMessage"] is string message)
+        {
+            <div class="alert info stdp-msg">@message</div>
+        }
+
+        <!-- Tab Row -->
+        <div class="stdp-tab-row" role="tablist">
+            <button class="stdp-tab active" data-tab="overview" role="tab">Tổng quan</button>
+            <button class="stdp-tab" data-tab="exams" role="tab">
+                Bài thi
+                @if (Model.Count > 0)
+                {
+                    <span class="stdp-tab-badge">@Model.Count</span>
+                }
+            </button>
+            <button class="stdp-tab" data-tab="history" role="tab">Lịch sử thi</button>
+        </div>
+
+        <!-- ── TAB: TỔNG QUAN ── -->
+        <div id="tab-overview" class="stdp-tab-pane active">
+            <!-- Stat grid (4 ô) -->
+            <div class="stdp-stat-grid">
+                <div class="stdp-stat-c">
+                    <div class="stdp-stat-n" style="color:var(--primary)">@avg.ToString("0.0")</div>
+                    <div class="stdp-stat-l">Điểm TB</div>
+                </div>
+                <div class="stdp-stat-c">
+                    <div class="stdp-stat-n">@completed</div>
+                    <div class="stdp-stat-l">Bài đã thi</div>
+                </div>
+                <div class="stdp-stat-c">
+                    <div class="stdp-stat-n" style="color:var(--success)">@passRate%</div>
+                    <div class="stdp-stat-l">Tỷ lệ đạt</div>
+                </div>
+                <div class="stdp-stat-c">
+                    <div class="stdp-stat-n" style="color:var(--warning)">@(classRank > 0 ? $"#{classRank}" : "—")</div>
+                    <div class="stdp-stat-l">Xếp hạng lớp</div>
+                </div>
+            </div>
+
+            <!-- Bar chart: Tiến độ điểm theo tháng -->
+            <div class="stdp-sec">Tiến độ điểm theo tháng</div>
+            <div class="stdp-chart-area" id="monthly-chart">
+                @foreach (dynamic m in monthlyRaw)
+                {
+                    decimal? avgVal = m.Avg;
+                    var h = avgVal.HasValue ? (int)(avgVal.Value / maxScore * 100) : 0;
+                    var col = !avgVal.HasValue ? "var(--border)" : avgVal >= 8 ? "#2563EB" : avgVal >= 6.5m ? "#3B82F6" : "#F97316";
+                    <div class="stdp-bar-col">
+                        <span class="stdp-bar-val">@(avgVal.HasValue ? avgVal.Value.ToString("0.0") : "—")</span>
+                        <div class="stdp-bar" data-h="@h"
+                             style="background:@col;opacity:@(avgVal.HasValue ? "1" : "0.2")"></div>
+                    </div>
+                }
+            </div>
+            <div class="stdp-x-row">
+                @foreach (dynamic m in monthlyRaw)
+                {
+                    <div class="stdp-x-lbl">@((string)m.Label)</div>
+                }
+            </div>
+
+            <!-- Điểm theo môn -->
+            <div class="stdp-sec" style="margin-top:16px">Điểm theo môn học</div>
+            @if (!subjectRaw.Any())
+            {
+                <p class="muted">Chưa có dữ liệu thi.</p>
+            }
+            @foreach (dynamic s in subjectRaw)
+            {
+                decimal scoreVal = s.AvgScore;
+                int count = s.Count;
+                string subjName = s.SubjectName;
+                DateTime? lastDt = s.LastDate;
+                var bw = (int)(scoreVal / maxScore * 100);
+                var sc = scoreVal >= 8 ? "#2563EB" : scoreVal >= 6.5m ? "#16A34A" : "#C2410C";
+                var bg = scoreVal >= 8 ? "#3B82F6" : scoreVal >= 6.5m ? "#22C55E" : "#F97316";
+                <div class="stdp-subj-row">
+                    <div class="stdp-subj-info">
+                        <div class="stdp-subj-name">@subjName</div>
+                        <div class="stdp-subj-meta">@count lần thi · gần nhất: @(lastDt?.ToLocalTime().ToString("dd/MM/yyyy") ?? "—")</div>
+                    </div>
+                    <div class="stdp-pb"><div class="stdp-pb-f" data-w="@bw" style="background:@bg"></div></div>
+                    <div class="stdp-score" style="color:@sc">@scoreVal.ToString("0.0")</div>
+                </div>
+            }
+
+            <!-- So sánh với lớp -->
+            <div class="stdp-compare">
+                <div class="stdp-sec">So sánh với lớp</div>
+                <div class="stdp-cmp-row">
+                    <div class="stdp-cmp-head">
+                        <span style="color:var(--text-secondary);font-size:12px">Học sinh này</span>
+                        <span style="color:var(--primary);font-weight:500;font-size:12px">@myAvg.ToString("0.0")</span>
+                    </div>
+                    <div class="stdp-cmp-bar"><div class="stdp-cmp-fill" data-w="@((int)(myAvg/maxScore*100))" style="background:#3B82F6"></div></div>
+                </div>
+                <div class="stdp-cmp-row">
+                    <div class="stdp-cmp-head">
+                        <span style="color:var(--text-secondary);font-size:12px">Trung bình lớp</span>
+                        <span style="color:var(--text-secondary);font-size:12px">@classAvg.ToString("0.0")</span>
+                    </div>
+                    <div class="stdp-cmp-bar"><div class="stdp-cmp-fill" data-w="@((int)(classAvg/maxScore*100))" style="background:var(--border)"></div></div>
+                </div>
+                @if (classSize > 0)
+                {
+                    <p class="muted" style="font-size:11px;margin-top:6px">Xếp hạng @classRank / @classSize học sinh trong lớp</p>
+                }
+            </div>
+        </div>
+
+        <!-- ── TAB: BÀI THI ── -->
+        <div id="tab-exams" class="stdp-tab-pane">
+            <div class="stdp-exam-grid">
+                @foreach (var exam in Model)
+                {
+                    var ea = attemptsByExam.GetValueOrDefault(exam.Id) ?? [];
+                    var inp = ea.FirstOrDefault(x => x.Status == AttemptStatus.InProgress);
+                    var fin = ea.Count(x => x.Status != AttemptStatus.InProgress);
+                    var canRetry = fin < exam.MaxAttempts;
+                    <article class="stdp-exam-card">
+                        <div class="stdp-ec-head">
+                            <span class="badge subject">@exam.Subject?.Name</span>
+                            <span class="stdp-ec-dur"><i class="fa-regular fa-clock"></i> @exam.DurationMinutes ph</span>
+                        </div>
+                        <h3 class="stdp-ec-title">@exam.Title</h3>
+                        <div class="stdp-ec-meta">
+                            <span><i class="fa-solid fa-list-check"></i> @(exam.QuestionCount?.ToString() ?? $"{exam.TotalPoints:0.#}đ") câu</span>
+                            <span><i class="fa-solid fa-rotate-right"></i> @fin/@exam.MaxAttempts lượt</span>
+                            <span><i class="fa-regular fa-calendar-xmark"></i> @exam.EndTime.ToLocalTime().ToString("dd/MM HH:mm")</span>
+                        </div>
+                        <div class="stdp-ec-action">
+                            @if (inp is not null)
+                            {
+                                <a class="btn primary full" asp-action="TakeExam" asp-route-attemptId="@inp.Id">
+                                    <i class="fa-solid fa-play"></i> Tiếp tục thi
+                                </a>
+                            }
+                            else if (canRetry)
+                            {
+                                <form method="post" asp-action="StartExam" asp-route-examId="@exam.Id">
+                                    @Html.AntiForgeryToken()
+                                    <button class="btn primary full" type="submit">
+                                        <i class="fa-solid fa-@(fin > 0 ? "rotate-right" : "play")"></i>
+                                        @(fin > 0 ? "Thi lại" : "Bắt đầu thi")
+                                    </button>
+                                </form>
+                            }
+                            else
+                            {
+                                <button class="btn full" disabled>Đã hết lượt thi</button>
+                            }
+                        </div>
+                    </article>
+                }
+                @if (Model.Count == 0)
+                {
+                    <div class="stdp-empty">
+                        <i class="fa-regular fa-folder-open"></i>
+                        <p>Không có bài thi nào cho lớp của bạn trong thời gian này.</p>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- ── TAB: LỊCH SỬ THI ── -->
+        <div id="tab-history" class="stdp-tab-pane">
+            @if (!attempts.Any(x => x.Score != null))
+            {
+                <div class="stdp-empty">
+                    <i class="fa-regular fa-clock-rotate-left"></i>
+                    <p>Chưa có bài thi nào được nộp.</p>
+                </div>
+            }
+            else
+            {
+                <div class="stdp-history-list">
+                    @foreach (var att in attempts.Where(x => x.Score != null).Take(20))
+                    {
+                        var sc = att.TotalPoints is > 0 ? att.Score!.Value / att.TotalPoints.Value * 10 : 0;
+                        var isPassed = sc >= (att.Exam?.PassScore ?? 5);
+                        var pctW = (int)Math.Min(sc / maxScore * 100, 100);
+                        <div class="stdp-hist-row">
+                            <div class="stdp-hist-info">
+                                <div class="stdp-hist-title">@att.Exam?.Title</div>
+                                <div class="stdp-hist-meta">
+                                    @att.Exam?.Subject?.Name · @att.SubmittedAt?.ToLocalTime().ToString("dd/MM/yyyy HH:mm")
+                                </div>
+                            </div>
+                            <div class="stdp-hist-bar-wrap">
+                                <div class="stdp-pb stdp-pb-wide"><div class="stdp-pb-f" data-w="@pctW" style="background:@(isPassed ? "#3B82F6" : "#F97316")"></div></div>
+                            </div>
+                            <div class="stdp-hist-score" style="color:@(isPassed ? "var(--primary)" : "var(--warning)")">@sc.ToString("0.0")</div>
+                            <a class="stdp-hist-link" asp-action="Result" asp-route-attemptId="@att.Id">Chi tiết</a>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+
+    </div><!-- /.stdp-main -->
+</div><!-- /.stdp-wrap -->
+
+@section Scripts {
+    <script>
+    (function () {
+        // Tab switching
+        document.querySelectorAll('.stdp-tab').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.stdp-tab').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.stdp-tab-pane').forEach(p => p.classList.remove('active'));
+                btn.classList.add('active');
+                const pane = document.getElementById('tab-' + btn.dataset.tab);
+                if (pane) pane.classList.add('active');
+            });
+        });
+
+        // Animate bar charts on load & on tab switch
+        function animateBars(root) {
+            (root || document).querySelectorAll('.stdp-bar[data-h]').forEach(bar => {
+                const target = bar.dataset.h + '%';
+                bar.style.height = '0';
+                requestAnimationFrame(() => setTimeout(() => { bar.style.height = target; }, 60));
+            });
+            (root || document).querySelectorAll('.stdp-pb-f[data-w], .stdp-cmp-fill[data-w]').forEach(el => {
+                const target = el.dataset.w + '%';
+                el.style.width = '0';
+                requestAnimationFrame(() => setTimeout(() => { el.style.width = target; }, 60));
+            });
+        }
+        animateBars();
+    })();
+    </script>
+}

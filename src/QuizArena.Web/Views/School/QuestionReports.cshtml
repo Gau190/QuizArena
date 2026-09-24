@@ -1,0 +1,44 @@
+@model QuestionReportsViewModel
+@{
+    ViewData["Title"] = "Phản hồi câu hỏi";
+}
+
+<section class="feature-shell">
+    <div class="feature-head">
+        <div>
+            <h1>Phản hồi câu hỏi</h1>
+            <p>Học sinh báo câu hỏi sai hoặc chưa rõ, giáo viên rà soát và lưu lịch sử xử lý.</p>
+        </div>
+        <a class="btn ghost" asp-controller="Teacher" asp-action="Questions"><i class="fa-solid fa-database"></i> Ngân hàng câu hỏi</a>
+    </div>
+
+    @if (TempData["SchoolMessage"] is string message)
+    {
+        <div class="alert info">@message</div>
+    }
+
+    <section class="panel">
+        <table class="data-table">
+            <thead><tr><th>Câu hỏi</th><th>Môn</th><th>Lý do</th><th>Người báo</th><th>Ngày</th><th>Trạng thái</th><th></th></tr></thead>
+            <tbody>
+            @foreach (var report in Model.Reports)
+            {
+                <tr>
+                    <td><b>Q@report.QuestionId</b><small>@report.Content</small></td>
+                    <td>@report.Subject</td>
+                    <td>@report.Reason</td>
+                    <td>@report.Reporter</td>
+                    <td>@report.CreatedAt</td>
+                    <td><span class="badge @(report.Status == "Đã xử lý" ? "subject" : "")">@report.Status</span></td>
+                    <td>
+                        <form method="post" asp-action="ReviewQuestionReport" asp-route-questionId="@report.QuestionId">
+                            @Html.AntiForgeryToken()
+                            <button class="icon-btn" type="submit">Xem</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </section>
+</section>

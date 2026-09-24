@@ -1,0 +1,218 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:var(--font-sans)}
+.w{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden}
+.nav{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-bottom:0.5px solid var(--color-border-tertiary)}
+.nav-logo{font-size:15px;font-weight:500;color:var(--color-text-primary)}
+.nav-logo span{color:#2563EB}
+.nav-r{display:flex;align-items:center;gap:10px}
+.notif-dot{position:relative;display:inline-flex}
+.dot-badge{position:absolute;top:-2px;right:-2px;width:7px;height:7px;background:#EF4444;border-radius:50%}
+.body{display:grid;grid-template-columns:220px 1fr}
+.sidebar{border-right:0.5px solid var(--color-border-tertiary);padding:16px}
+.sb-btn{display:flex;align-items:center;gap:6px;width:100%;padding:8px 12px;font-size:13px;font-weight:500;background:#2563EB;color:#EFF6FF;border:none;border-radius:var(--border-radius-md);cursor:pointer;margin-bottom:16px;font-family:var(--font-sans)}
+.sec{font-size:11px;font-weight:500;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:7px;margin-top:14px}
+.sec:first-of-type{margin-top:0}
+.nav-item{display:flex;align-items:center;justify-content:space-between;padding:7px 10px;border-radius:var(--border-radius-md);cursor:pointer;font-size:13px;margin-bottom:2px}
+.nav-item:hover{background:var(--color-background-secondary)}
+.nav-item.active{background:#EFF6FF;color:#2563EB;font-weight:500}
+.nav-item-label{display:flex;align-items:center;gap:7px;color:inherit}
+.count-badge{font-size:11px;padding:1px 7px;border-radius:20px;font-weight:500}
+.main{padding:0}
+.main-head{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:0.5px solid var(--color-border-tertiary)}
+.main-title{font-size:14px;font-weight:500;color:var(--color-text-primary)}
+.compose-box{margin:14px 20px;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:14px;background:var(--color-background-secondary)}
+.compose-label{font-size:11px;font-weight:500;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px}
+.recipient-row{display:flex;align-items:center;flex-wrap:wrap;gap:5px;margin-bottom:10px}
+.chip{font-size:11px;padding:3px 9px;border-radius:20px;font-weight:500;border:0.5px solid var(--color-border-secondary);background:var(--color-background-primary);color:var(--color-text-secondary);cursor:pointer}
+.chip.active{background:#EFF6FF;border-color:#93C5FD;color:#1E3A8A}
+.compose-inp{width:100%;padding:7px 10px;font-size:13px;background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);color:var(--color-text-primary);font-family:var(--font-sans);outline:none;margin-bottom:8px}
+.compose-inp:focus{border-color:#3B82F6}
+textarea.compose-inp{resize:vertical;min-height:60px}
+.compose-foot{display:flex;gap:8px;justify-content:flex-end}
+.cbtn{font-size:12px;padding:6px 12px;border-radius:var(--border-radius-md);cursor:pointer;font-family:var(--font-sans)}
+.cbtn-outline{background:transparent;border:0.5px solid var(--color-border-secondary);color:var(--color-text-primary)}
+.cbtn-ghost{background:var(--color-background-primary);border:0.5px solid var(--color-border-secondary);color:#2563EB}
+.cbtn-primary{background:#2563EB;color:#EFF6FF;border:none}
+.notif-list{padding:0 20px}
+.ni{padding:12px 0;border-bottom:0.5px solid var(--color-border-tertiary);display:flex;gap:10px;align-items:flex-start}
+.ni:last-child{border-bottom:none}
+.ni-icon{width:34px;height:34px;border-radius:var(--border-radius-md);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:15px}
+.ni-body{flex:1;min-width:0}
+.ni-title{font-size:13px;font-weight:500;color:var(--color-text-primary);margin-bottom:3px}
+.ni-desc{font-size:12px;color:var(--color-text-secondary);line-height:1.5;margin-bottom:7px}
+.ni-foot{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.ni-tag{font-size:11px;padding:2px 8px;border-radius:20px;font-weight:500}
+.ni-time{font-size:11px;color:var(--color-text-secondary)}
+.ni-actions{display:flex;gap:6px;margin-top:6px}
+.na-btn{font-size:11px;padding:4px 10px;border-radius:var(--border-radius-md);cursor:pointer;border:0.5px solid var(--color-border-tertiary);background:var(--color-background-primary);color:var(--color-text-secondary);font-family:var(--font-sans)}
+.na-btn.primary{color:#2563EB;border-color:#93C5FD;background:#EFF6FF}
+</style>
+<h2 class="sr-only">Trung tâm thông báo QuizArena dành cho Giáo viên</h2>
+<div class="w">
+  <div class="nav">
+    <div style="display:flex;align-items:center;gap:8px">
+      <span class="nav-logo"><span>Exam</span>Hub</span>
+      <span style="color:var(--color-border-secondary);font-size:13px">/</span>
+      <span style="font-size:13px;color:var(--color-text-secondary)">Thông báo</span>
+    </div>
+    <div class="nav-r">
+      <div class="notif-dot">
+        <i class="ti ti-bell" style="font-size:18px;color:var(--color-text-secondary)" aria-hidden="true"></i>
+        <span class="dot-badge"></span>
+      </div>
+      <span style="font-size:12px;padding:3px 10px;background:#DCFCE7;color:#166534;border-radius:20px;font-weight:500">Giáo viên</span>
+      <div style="width:28px;height:28px;border-radius:50%;background:#DCFCE7;color:#166534;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500">GV</div>
+    </div>
+  </div>
+
+  <div class="body">
+    <div class="sidebar">
+      <button class="sb-btn"><i class="ti ti-plus" style="font-size:14px" aria-hidden="true"></i>Soạn thông báo mới</button>
+
+      <div class="sec">Hộp thư</div>
+      <div class="nav-item active">
+        <div class="nav-item-label"><i class="ti ti-inbox" style="font-size:14px" aria-hidden="true"></i>Tất cả</div>
+        <span class="count-badge" style="background:#EFF6FF;color:#1E3A8A">5</span>
+      </div>
+      <div class="nav-item">
+        <div class="nav-item-label" style="color:var(--color-text-primary)"><i class="ti ti-circle-dot" style="font-size:14px;color:var(--color-text-secondary)" aria-hidden="true"></i>Chưa đọc</div>
+        <span class="count-badge" style="background:#FEE2E2;color:#DC2626">3</span>
+      </div>
+      <div class="nav-item">
+        <div class="nav-item-label" style="color:var(--color-text-primary)"><i class="ti ti-send" style="font-size:14px;color:var(--color-text-secondary)" aria-hidden="true"></i>Đã gửi</div>
+      </div>
+      <div class="nav-item">
+        <div class="nav-item-label" style="color:var(--color-text-primary)"><i class="ti ti-archive" style="font-size:14px;color:var(--color-text-secondary)" aria-hidden="true"></i>Lưu trữ</div>
+      </div>
+
+      <div class="sec">Loại thông báo</div>
+      <div class="nav-item">
+        <div class="nav-item-label" style="color:var(--color-text-primary)"><i class="ti ti-clipboard-list" style="font-size:14px;color:var(--color-text-secondary)" aria-hidden="true"></i>Kỳ thi</div>
+        <span class="count-badge" style="background:#EFF6FF;color:#1E3A8A">2</span>
+      </div>
+      <div class="nav-item">
+        <div class="nav-item-label" style="color:var(--color-text-primary)"><i class="ti ti-chart-bar" style="font-size:14px;color:var(--color-text-secondary)" aria-hidden="true"></i>Kết quả</div>
+        <span class="count-badge" style="background:#DCFCE7;color:#166534">1</span>
+      </div>
+      <div class="nav-item">
+        <div class="nav-item-label" style="color:var(--color-text-primary)"><i class="ti ti-alert-triangle" style="font-size:14px;color:#EF4444" aria-hidden="true"></i>Khẩn cấp</div>
+        <span class="count-badge" style="background:#FEE2E2;color:#DC2626">1</span>
+      </div>
+      <div class="nav-item">
+        <div class="nav-item-label" style="color:var(--color-text-primary)"><i class="ti ti-settings" style="font-size:14px;color:var(--color-text-secondary)" aria-hidden="true"></i>Hệ thống</div>
+      </div>
+
+      <div class="sec">Gửi tới</div>
+      <div class="nav-item">
+        <div class="nav-item-label" style="color:var(--color-text-primary)"><i class="ti ti-building" style="font-size:14px;color:var(--color-text-secondary)" aria-hidden="true"></i>Toàn trường</div>
+      </div>
+      <div class="nav-item">
+        <div class="nav-item-label" style="color:var(--color-text-primary)"><i class="ti ti-users" style="font-size:14px;color:var(--color-text-secondary)" aria-hidden="true"></i>Theo lớp</div>
+      </div>
+      <div class="nav-item">
+        <div class="nav-item-label" style="color:var(--color-text-primary)"><i class="ti ti-user" style="font-size:14px;color:var(--color-text-secondary)" aria-hidden="true"></i>Cá nhân</div>
+      </div>
+    </div>
+
+    <div class="main">
+      <div class="main-head">
+        <span class="main-title">Tất cả thông báo <span style="color:var(--color-text-secondary);font-weight:400">(12 thông báo)</span></span>
+        <button class="cbtn cbtn-outline" style="font-size:12px"><i class="ti ti-checks" style="font-size:13px;margin-right:4px" aria-hidden="true"></i>Đánh dấu đã đọc</button>
+      </div>
+
+      <div class="compose-box">
+        <div class="compose-label">Soạn thông báo mới</div>
+        <div style="font-size:11px;color:var(--color-text-secondary);margin-bottom:5px">Gửi tới</div>
+        <div class="recipient-row">
+          <span class="chip active">Toàn trường</span>
+          <span class="chip active">Khối 12</span>
+          <span class="chip active">Lớp 12A1</span>
+          <span class="chip">Lớp 12A2</span>
+          <span class="chip">Học sinh cụ thể</span>
+        </div>
+        <input class="compose-inp" type="text" placeholder="Tiêu đề..." value="Lịch kiểm tra Toán giữa kỳ II — Lớp 12A1">
+        <textarea class="compose-inp" placeholder="Nội dung thông báo...">Các em học sinh lớp 12A1 chú ý: Kiểm tra Toán giữa kỳ II sẽ diễn ra vào 8:00 sáng ngày 28/03/2025...</textarea>
+        <div class="compose-foot">
+          <button class="cbtn cbtn-outline">Hủy</button>
+          <button class="cbtn cbtn-ghost"><i class="ti ti-clock" style="font-size:13px;margin-right:4px" aria-hidden="true"></i>Hẹn giờ gửi</button>
+          <button class="cbtn cbtn-primary"><i class="ti ti-send" style="font-size:13px;margin-right:4px" aria-hidden="true"></i>Gửi ngay</button>
+        </div>
+      </div>
+
+      <div class="notif-list">
+        <div class="ni" style="background:#FEE2E2;margin:0 -20px;padding:12px 20px;border-bottom:0.5px solid var(--color-border-tertiary)">
+          <div class="ni-icon" style="background:#FECACA"><i class="ti ti-alert-triangle" style="color:#DC2626" aria-hidden="true"></i></div>
+          <div class="ni-body">
+            <div class="ni-title" style="color:#991B1B">Học sinh Bùi Thanh Liêm — cần theo dõi khẩn</div>
+            <div class="ni-desc">Học sinh chưa tham dự 3 bài kiểm tra liên tiếp trong 2 tuần qua. Điểm TB hiện tại: 5.8. Đề nghị liên hệ phụ huynh.</div>
+            <div class="ni-foot">
+              <span class="ni-tag" style="background:#FECACA;color:#991B1B">Khẩn cấp</span>
+              <span class="ni-time">2 giờ trước · Hệ thống tự động</span>
+            </div>
+            <div class="ni-actions">
+              <button class="na-btn primary">Xem hồ sơ</button>
+              <button class="na-btn">Liên hệ phụ huynh</button>
+              <button class="na-btn">Bỏ qua</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="ni">
+          <div class="ni-icon" style="background:#EFF6FF"><i class="ti ti-chart-bar" style="color:#2563EB" aria-hidden="true"></i></div>
+          <div class="ni-body">
+            <div class="ni-title">Kỳ thi Vật lý lần 2 — kết quả đã sẵn sàng</div>
+            <div class="ni-desc">38/40 học sinh lớp 12A1 đã nộp bài. Điểm TB: 7.6. 2 học sinh chưa làm bài.</div>
+            <div class="ni-foot">
+              <span class="ni-tag" style="background:#EFF6FF;color:#1E3A8A">Kết quả</span>
+              <span class="ni-time">5 giờ trước</span>
+            </div>
+            <div class="ni-actions">
+              <button class="na-btn primary">Xem thống kê</button>
+              <button class="na-btn">Nhắc 2 học sinh chưa thi</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="ni">
+          <div class="ni-icon" style="background:#FFEDD5"><i class="ti ti-clock" style="color:#C2410C" aria-hidden="true"></i></div>
+          <div class="ni-body">
+            <div class="ni-title">Nhắc nhở: Kiểm tra Toán giữa kỳ II — còn 3 ngày</div>
+            <div class="ni-desc">Kỳ thi sẽ diễn ra vào 28/03/2025. Hãy xác nhận ngân hàng câu hỏi và cài đặt kỳ thi trước 26/03.</div>
+            <div class="ni-foot">
+              <span class="ni-tag" style="background:#FFEDD5;color:#633806">Kỳ thi</span>
+              <span class="ni-time">Hôm qua</span>
+            </div>
+            <div class="ni-actions">
+              <button class="na-btn primary">Cài đặt kỳ thi</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="ni">
+          <div class="ni-icon" style="background:#DCFCE7"><i class="ti ti-star" style="color:#16A34A" aria-hidden="true"></i></div>
+          <div class="ni-body">
+            <div class="ni-title">Nguyễn Thị Thanh đạt điểm tuyệt đối Tiếng Anh</div>
+            <div class="ni-desc">Học sinh đạt 10/10 trong bài kiểm tra Tiếng Anh 15 phút ngày 05/03. Xếp hạng #1 lớp.</div>
+            <div class="ni-foot">
+              <span class="ni-tag" style="background:#DCFCE7;color:#166534">Thành tích</span>
+              <span class="ni-time">2 ngày trước</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="ni">
+          <div class="ni-icon" style="background:var(--color-background-secondary)"><i class="ti ti-users" style="color:var(--color-text-secondary)" aria-hidden="true"></i></div>
+          <div class="ni-body">
+            <div class="ni-title">3 học sinh mới được thêm vào lớp 12A1</div>
+            <div class="ni-desc">Admin đã thêm: Đỗ Văn Long, Vũ Thị Lan, Trịnh Hải Nam. Các tài khoản đã được kích hoạt.</div>
+            <div class="ni-foot">
+              <span class="ni-tag" style="background:var(--color-background-secondary);color:var(--color-text-secondary);border:0.5px solid var(--color-border-tertiary)">Hệ thống</span>
+              <span class="ni-time">3 ngày trước</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

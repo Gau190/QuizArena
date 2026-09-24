@@ -1,0 +1,194 @@
+@{
+    ViewData["Title"] = "Tạo kỳ thi";
+    var subjects = (IReadOnlyList<Subject>)ViewBag.Subjects;
+    var classes = (IReadOnlyList<SchoolClass>)ViewBag.Classes;
+    var exams = (IReadOnlyList<Exam>)ViewBag.Exams;
+}
+
+<section class="feature-shell">
+    <div class="feature-head">
+        <div>
+            <h1>Tạo kỳ thi mới</h1>
+            <p>Cấu hình đề ngẫu nhiên theo số lượng hoặc tổng điểm, gán lớp và thiết lập bảo mật trước khi publish.</p>
+        </div>
+        <a class="btn ghost" asp-action="Results"><i class="fa-solid fa-chart-simple"></i> Xem kết quả</a>
+    </div>
+
+    @if (TempData["TeacherMessage"] is string message)
+    {
+        <div class="alert info">@message</div>
+    }
+
+    <form class="exam-wizard" method="post">
+        @Html.AntiForgeryToken()
+        <section class="panel wizard-step">
+            <div class="step-num">1</div>
+            <div class="step-body">
+                <div class="panel-head tight">
+                    <h2>Thông tin chung</h2>
+                    <p>Tên kỳ thi, môn học, lớp áp dụng và khung thời gian.</p>
+                </div>
+                <div class="wizard-grid">
+                    <label class="wide">Tên kỳ thi<input name="title" value="Kiểm tra Toán giữa kỳ II - Lớp 12A" required /></label>
+                    <label>Môn học<select name="subjectId">@foreach (var subject in subjects) { <option value="@subject.Id">@System.Net.WebUtility.HtmlDecode(subject.Name)</option> }</select></label>
+                    <label>Lớp áp dụng
+                        <select name="classIds" multiple size="4">
+                            @foreach (var item in classes)
+                            {
+                                <option value="@item.Id">@item.Name</option>
+                            }
+                        </select>
+                    </label>
+                    <label>Bắt đầu<input name="startTime" type="datetime-local" value="@DateTime.Now.AddDays(1).ToString("yyyy-MM-ddTHH:mm")" required /></label>
+                    <label>Kết thúc<input name="endTime" type="datetime-local" value="@DateTime.Now.AddDays(1).AddHours(2).ToString("yyyy-MM-ddTHH:mm")" required /></label>
+                    <label>Thời lượng làm bài<input name="durationMinutes" type="number" value="45" min="1" required /></label>
+                    <label>Số lần thi tối đa<input name="maxAttempts" type="number" value="1" min="1" required /></label>
+                    <label class="wide">Mô tả<input name="description" placeholder="Ghi chú cho học sinh hoặc phạm vi ôn tập" /></label>
+                </div>
+            </div>
+        </section>
+
+        <section class="panel wizard-step">
+            <div class="step-num">2</div>
+            <div class="step-body">
+                <div class="panel-head tight">
+                    <h2>Cấu hình đề</h2>
+                    <p>Chọn cách sinh đề và phân bổ câu hỏi theo độ khó.</p>
+                </div>
+                <div class="wizard-grid">
+                    <label>Chế độ sinh đề<select name="generateMode"><option value="ByCount">Theo số câu</option><option value="ByPoints">Theo tổng điểm</option></select></label>
+                    <label>Số câu dự phòng<input name="questionCount" type="number" value="10" min="1" /></label>
+                    <label>Tổng điểm<input name="totalPoints" type="number" step="0.25" value="10" /></label>
+                    <label>Điểm đạt<input name="passScore" type="number" step="0.25" value="5" min="0" max="10" /></label>
+                    <label>Dễ<input name="easyCount" type="number" value="4" min="0" /></label>
+                    <label>Trung bình<input name="mediumCount" type="number" value="4" min="0" /></label>
+                    <label>Khó<input name="hardCount" type="number" value="2" min="0" /></label>
+                    <div class="preview-box">
+                        <b>Xem trước</b>
+                        <span>Tổng câu = Dễ + Trung bình + Khó. Nếu để 0, hệ thống dùng “Số câu dự phòng”.</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="panel wizard-step">
+            <div class="step-num">3</div>
+            <div class="step-body">
+                <div class="panel-head tight">
+                    <h2>Bảo mật & xuất bản</h2>
+                    <p>Thiết lập cách đảo đề, chống gian lận và trạng thái phát hành.</p>
+                </div>
+                <div class="toggle-list">
+                    <label>Đảo thứ tự câu hỏi<input name="shuffleQuestions" type="checkbox" value="true" checked /></label>
+                    <label>Đảo thứ tự đáp án<input name="shuffleAnswers" type="checkbox" value="true" checked /></label>
+                    <label>Chống chuyển tab<input name="antiCheat" type="checkbox" value="true" checked /></label>
+                    <label>Tự nộp khi hết giờ<input name="autoSubmit" type="checkbox" value="true" checked /></label>
+                    <label>Cho xem đáp án sau khi nộp<input name="allowViewAnswer" type="checkbox" value="true" /></label>
+                </div>
+                <div class="form-actions gap">
+                    <button class="btn ghost" type="submit" name="publishMode" value="Draft"><i class="fa-solid fa-floppy-disk"></i> Lưu nháp</button>
+                    <button class="btn primary" type="submit" name="publishMode" value="Published">Xuất bản <i class="fa-solid fa-arrow-right"></i></button>
+                </div>
+            </div>
+        </section>
+    </form>
+
+    <section class="panel">
+        <div class="panel-head">
+            <h1>Kỳ thi đã tạo</h1>
+        </div>
+        <table class="data-table">
+            <thead><tr><th>Kỳ thi</th><th>Môn/Lớp</th><th>Cấu hình</th><th>Bảo mật</th><th>Thời gian</th><th>Trạng thái</th><th></th></tr></thead>
+            <tbody>
+            @foreach (var exam in exams)
+            {
+                var examClassIds = exam.Classes.Select(x => x.ClassId).ToHashSet();
+                var classNames = exam.Classes.Select(x => x.Class?.Name).Where(x => !string.IsNullOrWhiteSpace(x)).DefaultIfEmpty("Chưa gán lớp");
+                <tr>
+                    <td>
+                        <form id="exam-form-@exam.Id" method="post" asp-action="UpdateExam" asp-route-id="@exam.Id">
+                            @Html.AntiForgeryToken()
+                        </form>
+                        <input name="title" form="exam-form-@exam.Id" value="@exam.Title" required />
+                        <input name="description" form="exam-form-@exam.Id" value="@exam.Description" placeholder="Mô tả" />
+                    </td>
+                    <td>
+                        <div class="inline-edit-stack">
+                            <select name="subjectId" form="exam-form-@exam.Id">
+                                @foreach (var subject in subjects)
+                                {
+                                    <option value="@subject.Id" selected="@(subject.Id == exam.SubjectId)">@System.Net.WebUtility.HtmlDecode(subject.Name)</option>
+                                }
+                            </select>
+                            <select name="classIds" form="exam-form-@exam.Id" multiple size="3">
+                                @foreach (var item in classes)
+                                {
+                                    <option value="@item.Id" selected="@examClassIds.Contains(item.Id)">@item.Name</option>
+                                }
+                            </select>
+                            <small>@string.Join(", ", classNames)</small>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="inline-edit-stack">
+                            <input name="durationMinutes" form="exam-form-@exam.Id" type="number" min="1" value="@exam.DurationMinutes" />
+                            <input name="maxAttempts" form="exam-form-@exam.Id" type="number" min="1" value="@exam.MaxAttempts" />
+                            <select name="generateMode" form="exam-form-@exam.Id">
+                                @foreach (var mode in Enum.GetValues<GenerateMode>())
+                                {
+                                    <option value="@mode" selected="@(mode == exam.GenerateMode)">@(mode == GenerateMode.ByCount ? "Theo số câu" : "Theo tổng điểm")</option>
+                                }
+                            </select>
+                            <input name="questionCount" form="exam-form-@exam.Id" type="number" min="1" value="@exam.QuestionCount" placeholder="Số câu" />
+                            <input name="totalPoints" form="exam-form-@exam.Id" type="number" step="0.25" value="@exam.TotalPoints?.ToString("0.##")" placeholder="Tổng điểm" />
+                            <input name="passScore" form="exam-form-@exam.Id" type="number" step="0.25" value="@exam.PassScore.ToString("0.##")" placeholder="Điểm đạt" />
+                            <div class="difficulty-inline">
+                                <input name="easyCount" form="exam-form-@exam.Id" type="number" min="0" value="@exam.EasyCount" title="Dễ" />
+                                <input name="mediumCount" form="exam-form-@exam.Id" type="number" min="0" value="@exam.MediumCount" title="Trung bình" />
+                                <input name="hardCount" form="exam-form-@exam.Id" type="number" min="0" value="@exam.HardCount" title="Khó" />
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="check-stack">
+                            <label><input name="shuffleQuestions" form="exam-form-@exam.Id" type="checkbox" value="true" checked="@exam.ShuffleQuestions" /> Đảo câu</label>
+                            <label><input name="shuffleAnswers" form="exam-form-@exam.Id" type="checkbox" value="true" checked="@exam.ShuffleAnswers" /> Đảo đáp án</label>
+                            <label><input name="antiCheat" form="exam-form-@exam.Id" type="checkbox" value="true" checked="@exam.AntiCheat" /> Chống gian lận</label>
+                            <label><input name="autoSubmit" form="exam-form-@exam.Id" type="checkbox" value="true" checked="@exam.AutoSubmit" /> Tự nộp</label>
+                            <label><input name="allowViewAnswer" form="exam-form-@exam.Id" type="checkbox" value="true" checked="@exam.AllowViewAnswer" /> Xem đáp án</label>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="inline-edit-stack">
+                            <input name="startTime" form="exam-form-@exam.Id" type="datetime-local" value="@exam.StartTime.ToLocalTime().ToString("yyyy-MM-ddTHH:mm")" />
+                            <input name="endTime" form="exam-form-@exam.Id" type="datetime-local" value="@exam.EndTime.ToLocalTime().ToString("yyyy-MM-ddTHH:mm")" />
+                        </div>
+                    </td>
+                    <td>
+                        <select name="status" form="exam-form-@exam.Id">
+                            @foreach (var status in Enum.GetValues<ExamStatus>())
+                            {
+                                <option value="@status" selected="@(status == exam.Status)">@status</option>
+                            }
+                        </select>
+                    </td>
+                    <td>
+                        <div class="table-actions">
+                            <button class="icon-btn" form="exam-form-@exam.Id" type="submit">Lưu</button>
+                            <a class="icon-btn" asp-action="Results" asp-route-examId="@exam.Id">Kết quả</a>
+                            <form method="post" asp-action="ToggleExam" asp-route-id="@exam.Id">
+                                @Html.AntiForgeryToken()
+                                <button class="icon-btn" type="submit">@(exam.IsActive ? "Tắt" : "Bật")</button>
+                            </form>
+                            <form method="post" asp-action="DeleteExam" asp-route-id="@exam.Id">
+                                @Html.AntiForgeryToken()
+                                <button class="icon-btn danger" type="submit">Xóa</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </section>
+</section>

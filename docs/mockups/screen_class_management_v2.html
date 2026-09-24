@@ -1,0 +1,246 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:var(--font-sans)}
+.w{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden}
+.nav{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-bottom:0.5px solid var(--color-border-tertiary)}
+.nav-logo{font-size:15px;font-weight:500;color:var(--color-text-primary)}
+.nav-logo span{color:#2563EB}
+.ph{padding:18px 20px;border-bottom:0.5px solid var(--color-border-tertiary)}
+.ph-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.ph-title{font-size:18px;font-weight:500;color:var(--color-text-primary)}
+.btn-row{display:flex;gap:8px}
+.btn{display:flex;align-items:center;gap:5px;font-size:12px;font-weight:500;padding:7px 12px;border-radius:var(--border-radius-md);cursor:pointer;font-family:var(--font-sans)}
+.btn-outline{background:var(--color-background-primary);border:0.5px solid var(--color-border-secondary);color:var(--color-text-primary)}
+.btn-primary{background:#2563EB;color:#EFF6FF;border:none}
+.filters{display:flex;gap:8px}
+.fi{font-size:12px;padding:7px 12px;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);background:var(--color-background-primary);color:var(--color-text-primary);font-family:var(--font-sans);flex:1}
+.class-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:16px 20px;border-bottom:0.5px solid var(--color-border-tertiary)}
+.cc{border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:14px 16px;cursor:pointer}
+.cc.sel{border-color:#3B82F6;background:#EFF6FF}
+.cc-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px}
+.cc-name{font-size:15px;font-weight:500;color:var(--color-text-primary)}
+.cc-gv{font-size:12px;color:var(--color-text-secondary);margin-top:2px}
+.cc-stats{display:flex;gap:16px;margin-top:10px}
+.cc-stat{font-size:13px;color:var(--color-text-primary)}
+.cc-stat span{color:var(--color-text-secondary);font-size:11px;display:block;margin-top:1px}
+.tbl-head{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:0.5px solid var(--color-border-tertiary)}
+.tbl-title{font-size:13px;font-weight:500;color:var(--color-text-primary)}
+table{width:100%;border-collapse:collapse;font-size:12px;table-layout:fixed}
+th{text-align:left;padding:8px 14px;font-size:11px;font-weight:500;color:var(--color-text-secondary);letter-spacing:.04em;text-transform:uppercase;border-bottom:0.5px solid var(--color-border-tertiary);background:var(--color-background-secondary)}
+td{padding:10px 14px;border-bottom:0.5px solid var(--color-border-tertiary);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+.av-xs{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;flex-shrink:0}
+.sd{display:flex;align-items:center;gap:7px}
+.sd-name{font-size:12px;font-weight:500;color:var(--color-text-primary)}
+.status-dot{width:6px;height:6px;border-radius:50%;display:inline-block;margin-right:4px}
+.act-btn{font-size:11px;padding:3px 8px;border-radius:var(--border-radius-md);cursor:pointer;border:0.5px solid var(--color-border-tertiary);background:var(--color-background-primary);color:var(--color-text-secondary);font-family:var(--font-sans)}
+.bot{display:grid;grid-template-columns:1fr 1fr;gap:0;border-top:0.5px solid var(--color-border-tertiary)}
+.bot-l{padding:16px 20px;border-right:0.5px solid var(--color-border-tertiary)}
+.bot-r{padding:16px 20px}
+.sec{font-size:11px;font-weight:500;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px}
+.tv-row{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:0.5px solid var(--color-border-tertiary)}
+.tv-row:last-child{border-bottom:none}
+.exam-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:0.5px solid var(--color-border-tertiary)}
+.exam-row:last-child{border-bottom:none}
+.exam-icon{width:32px;height:32px;border-radius:var(--border-radius-md);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.exam-info{flex:1}
+.exam-name{font-size:12px;font-weight:500;color:var(--color-text-primary)}
+.exam-meta{font-size:11px;color:var(--color-text-secondary);margin-top:1px}
+</style>
+<h2 class="sr-only">Trang quản lý lớp học dành cho Admin — danh sách lớp và học sinh</h2>
+<div class="w">
+  <div class="nav">
+    <div style="display:flex;align-items:center;gap:8px">
+      <span class="nav-logo"><span>Exam</span>Hub</span>
+      <span style="color:var(--color-border-secondary);font-size:13px">/</span>
+      <span style="font-size:13px;color:var(--color-text-secondary)">Quản lý lớp học</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <span style="font-size:12px;padding:3px 10px;background:#F1F5F9;color:#334155;border-radius:20px;font-weight:500">Admin</span>
+      <div style="width:28px;height:28px;border-radius:50%;background:#F1F5F9;color:#334155;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500">AD</div>
+    </div>
+  </div>
+
+  <div class="ph">
+    <div class="ph-top">
+      <div class="ph-title">Lớp học</div>
+      <div class="btn-row">
+        <button class="btn btn-outline"><i class="ti ti-upload" style="font-size:13px" aria-hidden="true"></i>Import danh sách</button>
+        <button class="btn btn-primary"><i class="ti ti-plus" style="font-size:13px" aria-hidden="true"></i>Tạo lớp mới</button>
+      </div>
+    </div>
+    <div class="filters">
+      <input class="fi" type="text" placeholder="Tìm lớp... (vd: 12A)" value="12A" style="max-width:180px">
+      <select class="fi" style="max-width:140px"><option>Khối 12</option><option>Khối 11</option><option>Khối 10</option></select>
+      <select class="fi" style="max-width:180px"><option>Niên khóa: 2024–2025</option><option>2025–2026</option></select>
+    </div>
+  </div>
+
+  <div class="class-grid">
+    <div class="cc sel">
+      <div class="cc-top">
+        <div><div class="cc-name">12A1</div><div class="cc-gv">GVCN: Trần Thị Bích · Phòng 301</div></div>
+        <span style="font-size:11px;padding:2px 8px;border-radius:20px;background:#DCFCE7;color:#166534;font-weight:500">Khoa học tự nhiên</span>
+      </div>
+      <div class="cc-stats">
+        <div class="cc-stat">40 <span>học sinh</span></div>
+        <div class="cc-stat" style="color:#2563EB">8.2 <span>điểm TB</span></div>
+      </div>
+    </div>
+    <div class="cc">
+      <div class="cc-top">
+        <div><div class="cc-name">12A2</div><div class="cc-gv">GVCN: Nguyễn Văn Cường · Phòng 302</div></div>
+        <span style="font-size:11px;padding:2px 8px;border-radius:20px;background:#DCFCE7;color:#166534;font-weight:500">Khoa học tự nhiên</span>
+      </div>
+      <div class="cc-stats">
+        <div class="cc-stat">38 <span>học sinh</span></div>
+        <div class="cc-stat" style="color:#2563EB">7.9 <span>điểm TB</span></div>
+      </div>
+    </div>
+    <div class="cc">
+      <div class="cc-top">
+        <div><div class="cc-name">12A3</div><div class="cc-gv">GVCN: Lê Thị Hoa · Phòng 303</div></div>
+        <span style="font-size:11px;padding:2px 8px;border-radius:20px;background:#EFF6FF;color:#1E3A8A;font-weight:500">Khoa học xã hội</span>
+      </div>
+      <div class="cc-stats">
+        <div class="cc-stat">42 <span>học sinh</span></div>
+        <div class="cc-stat" style="color:#2563EB">8.0 <span>điểm TB</span></div>
+      </div>
+    </div>
+    <div class="cc">
+      <div class="cc-top">
+        <div><div class="cc-name">12A4</div><div class="cc-gv">GVCN: Phạm Minh Tuấn · Phòng 304</div></div>
+        <span style="font-size:11px;padding:2px 8px;border-radius:20px;background:#FFEDD5;color:#633806;font-weight:500">Toán – Tin</span>
+      </div>
+      <div class="cc-stats">
+        <div class="cc-stat">37 <span>học sinh</span></div>
+        <div class="cc-stat" style="color:#2563EB">8.5 <span>điểm TB</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tbl-head">
+    <span class="tbl-title">Danh sách học sinh — Lớp 12A1 <span style="color:var(--color-text-secondary);font-weight:400">(40 học sinh)</span></span>
+    <div class="btn-row">
+      <button class="btn btn-outline"><i class="ti ti-file-spreadsheet" style="font-size:13px" aria-hidden="true"></i>Xuất Excel</button>
+      <button class="btn btn-primary"><i class="ti ti-plus" style="font-size:13px" aria-hidden="true"></i>Thêm học sinh</button>
+    </div>
+  </div>
+
+  <div style="overflow-x:auto">
+    <table>
+      <thead><tr>
+        <th style="width:36px">#</th>
+        <th style="width:160px">Họ và tên</th>
+        <th style="width:90px">Mã HS</th>
+        <th style="width:100px">Ngày sinh</th>
+        <th style="width:60px">Bài đã thi</th>
+        <th style="width:70px">Điểm TB</th>
+        <th style="width:100px">Trạng thái</th>
+        <th style="width:80px">Thao tác</th>
+      </tr></thead>
+      <tbody>
+        <tr>
+          <td style="color:var(--color-text-secondary);font-size:11px;text-align:center">1</td>
+          <td><div class="sd"><div class="av-xs" style="background:#EFF6FF;color:#1E3A8A">NT</div><div class="sd-name">Nguyễn Thị Thanh</div></div></td>
+          <td style="color:var(--color-text-secondary)">HS-0089</td>
+          <td style="color:var(--color-text-secondary)">15/03/2007</td>
+          <td style="text-align:center">24</td>
+          <td><span style="font-size:13px;font-weight:500;color:#2563EB">9.1</span></td>
+          <td><span class="status-dot" style="background:#22C55E"></span><span style="font-size:12px">Hoạt động</span></td>
+          <td><div style="display:flex;gap:5px"><button class="act-btn"><i class="ti ti-eye" style="font-size:12px" aria-hidden="true"></i></button><button class="act-btn"><i class="ti ti-edit" style="font-size:12px" aria-hidden="true"></i></button></div></td>
+        </tr>
+        <tr>
+          <td style="color:var(--color-text-secondary);font-size:11px;text-align:center">2</td>
+          <td><div class="sd"><div class="av-xs" style="background:#F1F5F9;color:#334155">PH</div><div class="sd-name">Phạm Minh Hoàng</div></div></td>
+          <td style="color:var(--color-text-secondary)">HS-0091</td>
+          <td style="color:var(--color-text-secondary)">22/07/2007</td>
+          <td style="text-align:center">22</td>
+          <td><span style="font-size:13px;font-weight:500;color:#16A34A">8.8</span></td>
+          <td><span class="status-dot" style="background:#22C55E"></span><span style="font-size:12px">Hoạt động</span></td>
+          <td><div style="display:flex;gap:5px"><button class="act-btn"><i class="ti ti-eye" style="font-size:12px" aria-hidden="true"></i></button><button class="act-btn"><i class="ti ti-edit" style="font-size:12px" aria-hidden="true"></i></button></div></td>
+        </tr>
+        <tr>
+          <td style="color:var(--color-text-secondary);font-size:11px;text-align:center">3</td>
+          <td><div class="sd"><div class="av-xs" style="background:#DCFCE7;color:#166534">LT</div><div class="sd-name">Lê Ngọc Tuyết</div></div></td>
+          <td style="color:var(--color-text-secondary)">HS-0095</td>
+          <td style="color:var(--color-text-secondary)">09/11/2007</td>
+          <td style="text-align:center">21</td>
+          <td><span style="font-size:13px;font-weight:500;color:#2563EB">8.5</span></td>
+          <td><span class="status-dot" style="background:#22C55E"></span><span style="font-size:12px">Hoạt động</span></td>
+          <td><div style="display:flex;gap:5px"><button class="act-btn"><i class="ti ti-eye" style="font-size:12px" aria-hidden="true"></i></button><button class="act-btn"><i class="ti ti-edit" style="font-size:12px" aria-hidden="true"></i></button></div></td>
+        </tr>
+        <tr>
+          <td style="color:var(--color-text-secondary);font-size:11px;text-align:center">4</td>
+          <td><div class="sd"><div class="av-xs" style="background:#FFEDD5;color:#633806">TH</div><div class="sd-name">Trần Quốc Huy</div></div></td>
+          <td style="color:var(--color-text-secondary)">HS-0102</td>
+          <td style="color:var(--color-text-secondary)">30/01/2007</td>
+          <td style="text-align:center">18</td>
+          <td><span style="font-size:13px;font-weight:500;color:#C2410C">7.2</span></td>
+          <td><span class="status-dot" style="background:#F97316"></span><span style="font-size:12px;color:#C2410C">Ít hoạt động</span></td>
+          <td><div style="display:flex;gap:5px"><button class="act-btn"><i class="ti ti-eye" style="font-size:12px" aria-hidden="true"></i></button><button class="act-btn"><i class="ti ti-edit" style="font-size:12px" aria-hidden="true"></i></button></div></td>
+        </tr>
+        <tr>
+          <td style="color:var(--color-text-secondary);font-size:11px;text-align:center">5</td>
+          <td><div class="sd"><div class="av-xs" style="background:#FEE2E2;color:#991B1B">BL</div><div class="sd-name">Bùi Thanh Liêm</div></div></td>
+          <td style="color:var(--color-text-secondary)">HS-0110</td>
+          <td style="color:var(--color-text-secondary)">14/05/2007</td>
+          <td style="text-align:center">5</td>
+          <td><span style="font-size:13px;font-weight:500;color:#DC2626">5.8</span></td>
+          <td><span class="status-dot" style="background:#EF4444"></span><span style="font-size:12px;color:#DC2626">Cần theo dõi</span></td>
+          <td><div style="display:flex;gap:5px"><button class="act-btn"><i class="ti ti-eye" style="font-size:12px" aria-hidden="true"></i></button><button class="act-btn"><i class="ti ti-edit" style="font-size:12px" aria-hidden="true"></i></button></div></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="bot">
+    <div class="bot-l">
+      <div class="sec">Giáo viên phụ trách — 12A1</div>
+      <div class="tv-row">
+        <div class="av-xs" style="background:#FFEDD5;color:#633806;font-size:10px">TB</div>
+        <div style="flex:1"><div style="font-size:12px;font-weight:500;color:var(--color-text-primary)">Trần Thị Bích</div><div style="font-size:11px;color:var(--color-text-secondary)">GVCN · Toán học</div></div>
+        <span style="font-size:11px;padding:2px 7px;background:#DCFCE7;color:#166534;border-radius:20px;font-weight:500">GVCN</span>
+      </div>
+      <div class="tv-row">
+        <div class="av-xs" style="background:#F1F5F9;color:#334155;font-size:10px">NV</div>
+        <div style="flex:1"><div style="font-size:12px;font-weight:500;color:var(--color-text-primary)">Nguyễn Thành Vinh</div><div style="font-size:11px;color:var(--color-text-secondary)">Vật lý</div></div>
+      </div>
+      <div class="tv-row">
+        <div class="av-xs" style="background:#FEE2E2;color:#991B1B;font-size:10px">PD</div>
+        <div style="flex:1"><div style="font-size:12px;font-weight:500;color:var(--color-text-primary)">Phạm Thị Dung</div><div style="font-size:11px;color:var(--color-text-secondary)">Hóa học</div></div>
+      </div>
+      <div class="tv-row">
+        <div class="av-xs" style="background:#E1F5EE;color:#085041;font-size:10px">LH</div>
+        <div style="flex:1"><div style="font-size:12px;font-weight:500;color:var(--color-text-primary)">Lê Minh Hiếu</div><div style="font-size:11px;color:var(--color-text-secondary)">Tiếng Anh</div></div>
+      </div>
+    </div>
+    <div class="bot-r">
+      <div class="sec">Kỳ thi sắp diễn ra</div>
+      <div class="exam-row">
+        <div class="exam-icon" style="background:#EFF6FF"><i class="ti ti-clipboard-list" style="font-size:15px;color:#2563EB" aria-hidden="true"></i></div>
+        <div class="exam-info">
+          <div class="exam-name">Kiểm tra Toán giữa kỳ II</div>
+          <div class="exam-meta">28/03/2025 · 45 phút · 40 câu</div>
+        </div>
+        <span style="font-size:11px;padding:2px 8px;background:#EFF6FF;color:#1E3A8A;border-radius:20px;font-weight:500">Sắp tới</span>
+      </div>
+      <div class="exam-row">
+        <div class="exam-icon" style="background:#DCFCE7"><i class="ti ti-clipboard-list" style="font-size:15px;color:#16A34A" aria-hidden="true"></i></div>
+        <div class="exam-info">
+          <div class="exam-name">Thi thử THPT Quốc gia — Lý</div>
+          <div class="exam-meta">01/04/2025 · 50 phút · 40 câu</div>
+        </div>
+        <span style="font-size:11px;padding:2px 8px;background:#DCFCE7;color:#166534;border-radius:20px;font-weight:500">Sắp tới</span>
+      </div>
+      <div class="exam-row">
+        <div class="exam-icon" style="background:#FFEDD5"><i class="ti ti-clipboard-list" style="font-size:15px;color:#C2410C" aria-hidden="true"></i></div>
+        <div class="exam-info">
+          <div class="exam-name">Kiểm tra Hóa học 15 phút</div>
+          <div class="exam-meta">03/04/2025 · 15 phút · 15 câu</div>
+        </div>
+        <span style="font-size:11px;padding:2px 8px;background:#FFEDD5;color:#633806;border-radius:20px;font-weight:500">Đang lên lịch</span>
+      </div>
+    </div>
+  </div>
+</div>

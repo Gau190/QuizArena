@@ -1,0 +1,87 @@
+@using System.Security.Claims
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#1E293B" />
+    <title>@ViewData["Title"] · QuizArena</title>
+    <link rel="icon" type="image/svg+xml" href="~/favicon.svg" />
+    <link rel="stylesheet" href="~/lib/fontawesome/css/all.min.css" />
+    <link rel="stylesheet" href="~/css/fonts.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+@{
+    var authed = User.Identity?.IsAuthenticated == true;
+    var role = User.FindFirstValue(ClaimTypes.Role);
+    var name = User.FindFirstValue("full_name") ?? User.Identity?.Name ?? "QuizArena";
+    var initials = string.Join("", name.Split(' ', StringSplitOptions.RemoveEmptyEntries).TakeLast(2).Select(x => x[0])).ToUpperInvariant();
+    var focus = ViewData["Focus"] is true;
+    var curController = (string?)ViewContext.RouteData.Values["controller"];
+    var curAction = (string?)ViewContext.RouteData.Values["action"];
+
+    string On(string controller, params string[] actions) =>
+        string.Equals(curController, controller, StringComparison.OrdinalIgnoreCase) &&
+        actions.Any(a => string.Equals(curAction, a, StringComparison.OrdinalIgnoreCase)) ? "active" : "";
+}
+<body class="@(focus ? "focus-mode" : "")">
+@if (authed)
+{
+    <header class="site-nav">
+        <div class="nav-inner">
+            <a class="nav-logo" asp-controller="Home" asp-action="Index"><span class="nav-mark">Q</span>QuizArena</a>
+            <nav class="nav-links" id="nav-links" aria-label="Điều hướng chính">
+                @if (role == "Admin")
+                {
+                    <a class="@On("Admin", "Dashboard")" asp-controller="Admin" asp-action="Dashboard">Tổng quan</a>
+                    <a class="@On("Admin", "Classes")" asp-controller="Admin" asp-action="Classes">Lớp học</a>
+                    <a class="@On("Admin", "AcademicYears")" asp-controller="Admin" asp-action="AcademicYears">Năm học</a>
+                    <a class="@On("Admin", "ExamRooms")" asp-controller="Admin" asp-action="ExamRooms">Phòng thi</a>
+                    <a class="@On("Admin", "Subjects")" asp-controller="Admin" asp-action="Subjects">Môn thi</a>
+                    <a class="@On("Admin", "Users")" asp-controller="Admin" asp-action="Users">Người dùng</a>
+                    <a class="@On("Admin", "Teachers")" asp-controller="Admin" asp-action="Teachers">Giáo viên</a>
+                    <a class="@On("School", "Reports")" asp-controller="School" asp-action="Reports">Báo cáo</a>
+                    <a class="@On("Admin", "Settings")" asp-controller="Admin" asp-action="Settings">Cài đặt</a>
+                }
+                @if (role == "Teacher")
+                {
+                    <a class="@On("Teacher", "Questions", "WeakQuestions")" asp-controller="Teacher" asp-action="Questions">Câu hỏi</a>
+                    <a class="@On("School", "ExamBlueprint")" asp-controller="School" asp-action="ExamBlueprint">Cấu trúc đề</a>
+                    <a class="@On("Teacher", "CreateExam")" asp-controller="Teacher" asp-action="CreateExam">Kỳ thi</a>
+                    <a class="@On("School", "Calendar")" asp-controller="School" asp-action="Calendar">Lịch thi</a>
+                    <a class="@On("Teacher", "Results")" asp-controller="Teacher" asp-action="Results">Kết quả</a>
+                    <a class="@On("School", "StudentProfile")" asp-controller="School" asp-action="StudentProfile">Học sinh</a>
+                    <a class="@On("School", "QuestionReports")" asp-controller="School" asp-action="QuestionReports">Phản hồi</a>
+                    <a class="@On("School", "Reports")" asp-controller="School" asp-action="Reports">Báo cáo</a>
+                }
+                @if (role == "Student")
+                {
+                    <a class="@On("Student", "Dashboard", "Result")" asp-controller="Student" asp-action="Dashboard">Trang chính</a>
+                    <a class="@On("School", "Calendar")" asp-controller="School" asp-action="Calendar">Lịch thi</a>
+                    <a class="@On("School", "StudentProfile")" asp-controller="School" asp-action="StudentProfile">Hồ sơ</a>
+                    <a class="@On("School", "Transcript")" asp-controller="School" asp-action="Transcript">Học bạ</a>
+                }
+                <a class="@On("School", "Notifications")" asp-controller="School" asp-action="Notifications">Thông báo</a>
+            </nav>
+            <form asp-controller="Account" asp-action="Logout" method="post" class="nav-user">
+                @Html.AntiForgeryToken()
+                <span class="avatar" title="@name">@initials</span>
+                <b>@name</b>
+                <button class="link-btn" type="submit">Đăng xuất</button>
+            </form>
+            <button class="nav-toggle" id="nav-toggle" type="button" aria-label="Mở menu" aria-controls="nav-links"><i class="fa-solid fa-bars"></i></button>
+        </div>
+    </header>
+    <main class="container">
+        @RenderBody()
+    </main>
+}
+else
+{
+    @RenderBody()
+}
+    <script src="~/lib/jquery/dist/jquery.min.js" asp-append-version="true"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

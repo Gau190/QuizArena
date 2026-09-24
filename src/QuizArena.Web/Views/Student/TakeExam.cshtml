@@ -1,0 +1,74 @@
+@using System.Text.Json
+@model QuestionPayload
+@{
+    ViewData["Title"] = "Làm bài thi";
+    ViewData["Focus"] = true;
+    var attempt = (ExamAttempt)ViewBag.Attempt;
+    var answeredIndexes = (IReadOnlyList<int>)(ViewBag.AnsweredIndexes ?? new List<int>());
+    // Dữ liệu câu hiện tại nhúng dạng JSON (không có cờ đáp án đúng); các câu sau tải bằng fetch.
+    var initial = new
+    {
+        index = Model.Index,
+        total = Model.Total,
+        questionId = Model.Question.Id,
+        content = Model.Question.Content,
+        type = Model.Question.Type.ToString(),
+        points = Model.Question.Points,
+        choices = Model.Question.Type == QuestionType.TextAnswer
+            ? []
+            : Model.Question.Answers.Select(a => new { id = a.Id, content = a.Content }).ToArray(),
+        selectedAnswerIds = Model.CurrentAnswer?.AnswerIds,
+        textInput = Model.CurrentAnswer?.TextInput
+    };
+}
+
+<div class="exam-page" id="exam-root" data-attempt-id="@attempt.Id" data-total="@Model.Total" data-answered="@string.Join(",", answeredIndexes)">
+    <div class="exam-bar">
+        <div class="exam-bar-inner">
+            <a class="exam-exit" asp-action="Dashboard" title="Thoát (bài làm được lưu, đồng hồ vẫn chạy)">&larr; Thoát</a>
+            <h1>@attempt.Exam?.Title</h1>
+            <span class="q-count" id="q-count">Câu @Model.Index / @Model.Total</span>
+            <div class="timer" id="timer-display" aria-live="off">--:--</div>
+        </div>
+    </div>
+
+    <div class="exam-layout">
+        <section class="exam-card" aria-live="polite">
+            <div class="q-meta" id="q-meta"></div>
+            <p class="question-text" id="q-text"></p>
+            <div id="q-answers"></div>
+            <div class="exam-nav">
+                <button class="btn" type="button" id="btn-prev">&larr; Câu trước</button>
+                <button class="btn primary" type="button" id="btn-next">Câu sau &rarr;</button>
+                <span class="spacer"></span>
+                <button class="btn ghost" type="button" id="mark-btn"><i class="fa-regular fa-flag"></i> Đánh dấu</button>
+                <button class="btn ghost" type="button" id="report-btn"><i class="fa-solid fa-triangle-exclamation"></i> Báo lỗi câu</button>
+            </div>
+            <p class="exam-msg" id="report-msg" hidden></p>
+        </section>
+
+        <aside class="palette" aria-label="Danh sách câu hỏi">
+            <h2><span id="answered-count">0</span>/@Model.Total câu đã làm</h2>
+            <div class="progress"><span id="progress-bar" style="width:0"></span></div>
+            <div class="palette-grid" id="palette"></div>
+            <div class="legend">
+                <span><i class="c"></i> Câu đang xem</span>
+                <span><i class="a"></i> Đã làm</span>
+                <span><i class="f"></i> Đã đánh dấu</span>
+                <span><i></i> Chưa làm</span>
+            </div>
+            <form method="post" asp-action="Submit" asp-route-attemptId="@attempt.Id" id="submit-form">
+                @Html.AntiForgeryToken()
+                <button class="btn danger full" type="submit" id="submit-btn">Nộp bài</button>
+            </form>
+        </aside>
+    </div>
+
+    <div class="anti-cheat" id="anti-cheat" hidden></div>
+</div>
+
+<script type="application/json" id="q-init">@Html.Raw(JsonSerializer.Serialize(initial))</script>
+
+@section Scripts {
+    <script src="~/js/exam.js" asp-append-version="true"></script>
+}

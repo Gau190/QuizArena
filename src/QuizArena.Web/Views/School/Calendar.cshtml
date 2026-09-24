@@ -1,0 +1,166 @@
+@model ExamCalendarViewModel
+@{
+    ViewData["Title"] = "Lịch thi";
+    var eventsByDay = Model.Events.GroupBy(x => x.Day).ToDictionary(x => x.Key, x => x.ToList());
+    var currentMonth = new DateTime(Model.Year, Model.Month, 1);
+    var previousMonth = currentMonth.AddMonths(-1);
+    var nextMonth = currentMonth.AddMonths(1);
+    var today = DateTime.Today;
+    var classes = (IReadOnlyList<SchoolClass>?)ViewBag.Classes ?? [];
+    var subjects = (IReadOnlyList<Subject>?)ViewBag.Subjects ?? [];
+    var selectedClassId = (int?)ViewBag.ClassId;
+    var selectedSubjectId = (int?)ViewBag.SubjectId;
+    var viewMode = Model.ViewMode;
+}
+
+<section class="feature-shell">
+    <div class="feature-head">
+        <div>
+            <h1>Lịch thi</h1>
+            <p>Calendar view toàn trường, phân loại màu theo môn và trạng thái kỳ thi.</p>
+        </div>
+        @if (ViewBag.CanCreateExam == true)
+        {
+            <a class="btn primary" asp-controller="Teacher" asp-action="CreateExam"><i class="fa-solid fa-plus"></i> Tạo kỳ thi</a>
+        }
+    </div>
+
+    <div class="calendar-layout">
+        <section class="panel">
+            <div class="calendar-head">
+                <div class="cal-nav">
+                    <a class="icon-btn" asp-action="Calendar" asp-route-year="@previousMonth.Year" asp-route-month="@previousMonth.Month" asp-route-classId="@selectedClassId" asp-route-subjectId="@selectedSubjectId" asp-route-view="@viewMode"><i class="fa-solid fa-chevron-left"></i></a>
+                    <b>@Model.MonthTitle</b>
+                    <a class="icon-btn" asp-action="Calendar" asp-route-year="@nextMonth.Year" asp-route-month="@nextMonth.Month" asp-route-classId="@selectedClassId" asp-route-subjectId="@selectedSubjectId" asp-route-view="@viewMode"><i class="fa-solid fa-chevron-right"></i></a>
+                    <a class="icon-btn" asp-action="Calendar" asp-route-year="@today.Year" asp-route-month="@today.Month" asp-route-classId="@selectedClassId" asp-route-subjectId="@selectedSubjectId" asp-route-view="@viewMode">Hôm nay</a>
+                </div>
+                <div class="segmented">
+                    <a class="@(viewMode == "week" ? "active" : "")" asp-action="Calendar" asp-route-year="@Model.Year" asp-route-month="@Model.Month" asp-route-classId="@selectedClassId" asp-route-subjectId="@selectedSubjectId" asp-route-view="week">Tuần</a>
+                    <a class="@(viewMode == "month" ? "active" : "")" asp-action="Calendar" asp-route-year="@Model.Year" asp-route-month="@Model.Month" asp-route-classId="@selectedClassId" asp-route-subjectId="@selectedSubjectId" asp-route-view="month">Tháng</a>
+                    <a class="@(viewMode == "list" ? "active" : "")" asp-action="Calendar" asp-route-year="@Model.Year" asp-route-month="@Model.Month" asp-route-classId="@selectedClassId" asp-route-subjectId="@selectedSubjectId" asp-route-view="list">Danh sách</a>
+                </div>
+            </div>
+
+            @if (viewMode == "list")
+            {
+                <table class="data-table calendar-list-table">
+                    <thead><tr><th>Kỳ thi</th><th>Môn</th><th>Lớp</th><th>Thời gian</th></tr></thead>
+                    <tbody>
+                    @foreach (var row in Model.ListRows ?? [])
+                    {
+                        <tr class="@(row.IsPast ? "muted-row" : "")">
+                            <td><b>@System.Net.WebUtility.HtmlDecode(row.Title)</b></td>
+                            <td>@System.Net.WebUtility.HtmlDecode(row.Subject)</td>
+                            <td>@row.ClassNames</td>
+                            <td>@row.TimeRange</td>
+                        </tr>
+                    }
+                    @if ((Model.ListRows?.Count ?? 0) == 0)
+                    {
+                        <tr><td colspan="4">Không có kỳ thi trong tháng này.</td></tr>
+                    }
+                    </tbody>
+                </table>
+            }
+            else if (viewMode == "week")
+            {
+                <div class="calendar-grid week-grid">
+                    @foreach (var dayName in new[] { "T2", "T3", "T4", "T5", "T6", "T7", "CN" })
+                    {
+                        <div class="calendar-dow">@dayName</div>
+                    }
+                    @{
+                        var weekStart = new DateTime(Model.Year, Model.Month, Model.WeekStartDay);
+                    }
+                    @for (var offset = 0; offset < 7; offset++)
+                    {
+                        var dayDate = weekStart.AddDays(offset);
+                        var inMonth = dayDate.Month == Model.Month;
+                        <div class="calendar-cell @(inMonth ? "" : "muted-cell")">
+                            <span class="day-num">@dayDate.Day</span>
+                            @if (inMonth && eventsByDay.TryGetValue(dayDate.Day, out var dayEvents))
+                            {
+                                @foreach (var ev in dayEvents)
+                                {
+                                    var evTitle = System.Net.WebUtility.HtmlDecode(ev.Title);
+                                    <div class="cal-event @(ev.IsMuted ? "muted" : "")" style="--event-color:@ev.Color" title="@System.Net.WebUtility.HtmlDecode(ev.Subject)">@evTitle</div>
+                                }
+                            }
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="calendar-grid">
+                    @foreach (var dayName in new[] { "T2", "T3", "T4", "T5", "T6", "T7", "CN" })
+                    {
+                        <div class="calendar-dow">@dayName</div>
+                    }
+                    @for (var blank = 0; blank < Model.LeadingBlankDays; blank++)
+                    {
+                        <div class="calendar-cell muted-cell"></div>
+                    }
+                    @for (var day = 1; day <= Model.DaysInMonth; day++)
+                    {
+                        <div class="calendar-cell @(day == today.Day && Model.Year == today.Year && Model.Month == today.Month ? "today-cell" : "")">
+                            <span class="day-num">@day</span>
+                            @if (eventsByDay.TryGetValue(day, out var dayEvents))
+                            {
+                                @foreach (var ev in dayEvents.Take(3))
+                                {
+                                    var evTitle2 = System.Net.WebUtility.HtmlDecode(ev.Title);
+                                    <div class="cal-event @(ev.IsMuted ? "muted" : "")" style="--event-color:@ev.Color" title="@System.Net.WebUtility.HtmlDecode(ev.Subject)">@evTitle2</div>
+                                }
+                            }
+                        </div>
+                    }
+                </div>
+            }
+        </section>
+
+        <aside class="panel calendar-side">
+            <h2>Chú thích màu</h2>
+            <div class="legend-list">
+                @foreach (var item in Model.Legend)
+                {
+                    <span><i style="background:@item.Color"></i>@System.Net.WebUtility.HtmlDecode(item.Label)</span>
+                }
+            </div>
+
+            <h2 class="side-section-title">Bộ lọc</h2>
+            <form class="side-filter" method="get">
+                <input type="hidden" name="year" value="@Model.Year" />
+                <input type="hidden" name="month" value="@Model.Month" />
+                <input type="hidden" name="view" value="@viewMode" />
+                <select name="classId">
+                    <option value="">Tất cả lớp</option>
+                    @foreach (var item in classes)
+                    {
+                        <option value="@item.Id" selected="@(item.Id == selectedClassId)">@item.Name</option>
+                    }
+                </select>
+                <select name="subjectId">
+                    <option value="">Tất cả môn</option>
+                    @foreach (var subject in subjects)
+                    {
+                        <option value="@subject.Id" selected="@(subject.Id == selectedSubjectId)">@System.Net.WebUtility.HtmlDecode(subject.Name)</option>
+                    }
+                </select>
+                <button class="btn ghost" type="submit"><i class="fa-solid fa-filter"></i> Lọc lịch</button>
+            </form>
+
+            <h2 class="side-section-title">Sắp diễn ra</h2>
+            @foreach (var exam in Model.UpcomingExams)
+            {
+                <article class="upcoming-item">
+                    <span class="date-pill">@exam.StartTime.ToLocalTime().ToString("dd/MM")</span>
+                    <div>
+                        <b>@System.Net.WebUtility.HtmlDecode(exam.Title)</b>
+                        <small>@System.Net.WebUtility.HtmlDecode(exam.Subject?.Name) · @exam.StartTime.ToLocalTime().ToString("HH:mm") · @exam.DurationMinutes phút</small>
+                    </div>
+                </article>
+            }
+        </aside>
+    </div>
+</section>

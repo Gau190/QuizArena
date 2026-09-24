@@ -1,0 +1,88 @@
+@model IReadOnlyList<ExamAttempt>
+@{
+    ViewData["Title"] = "Thống kê kết quả";
+    var exams = (IReadOnlyList<Exam>)ViewBag.Exams;
+    var selectedExamId = (int?)ViewBag.SelectedExamId;
+    var selectedStatus = (AttemptStatus?)ViewBag.Status;
+    var questionStats = (IReadOnlyList<QuestionResultStat>?)ViewBag.QuestionStats;
+    var avg = Model.Count == 0 ? 0 : Model.Average(x => x.Score ?? 0);
+    var pass = Model.Count == 0 ? 0 : Model.Count(x => (x.Score ?? 0) >= 5) * 100 / Model.Count;
+    var highest = Model.Count == 0 ? 0m : Model.Max(x => x.Score) ?? 0;
+    var lowest = Model.Count == 0 ? 0m : Model.Min(x => x.Score) ?? 0;
+}
+
+<section class="panel">
+    <div class="panel-head">
+        <h1>Thống kê kết quả</h1>
+        <div class="head-actions">
+            <form class="toolbar" method="get" asp-action="Results" asp-route-examId="@selectedExamId">
+                <select name="examId" onchange="this.form.action='/giang-vien/ket-qua/' + this.value; this.form.submit();">
+                    @foreach (var exam in exams)
+                    {
+                        <option value="@exam.Id" selected="@(exam.Id == selectedExamId)">@exam.Title</option>
+                    }
+                </select>
+                <select name="status">
+                    <option value="">Tất cả trạng thái</option>
+                    @foreach (var status in Enum.GetValues<AttemptStatus>())
+                    {
+                        <option value="@status" selected="@(status == selectedStatus)">@status</option>
+                    }
+                </select>
+                <button class="btn ghost" type="submit">Lọc</button>
+            </form>
+            @if (selectedExamId.HasValue)
+            {
+                <a class="btn ghost" asp-action="ExportResults" asp-route-examId="@selectedExamId" asp-route-status="@selectedStatus"><i class="fa-solid fa-file-excel"></i> Xuất Excel</a>
+            }
+        </div>
+    </div>
+    <div class="stats-row">
+        <div class="stat-box"><span>Tổng thí sinh</span><b>@Model.Count</b><small>đã dự thi</small></div>
+        <div class="stat-box"><span>Điểm trung bình</span><b>@avg.ToString("0.0")</b><small>/ 10.0</small></div>
+        <div class="stat-box"><span>Tỷ lệ đạt</span><b>@pass%</b><small>điểm >= 5</small></div>
+        <div class="stat-box"><span>Điểm cao nhất</span><b>@highest.ToString("0.0")</b><small>thấp nhất @lowest.ToString("0.0")</small></div>
+    </div>
+    <table class="data-table">
+        <thead><tr><th>Thí sinh</th><th>Trạng thái</th><th>Điểm</th><th>Nộp lúc</th></tr></thead>
+        <tbody>
+        @foreach (var attempt in Model)
+        {
+            <tr>
+                <td>@attempt.User?.FullName</td>
+                <td>@attempt.Status</td>
+                <td><div class="scorebar"><span style="width:@(((attempt.Score ?? 0) * 10).ToString("0"))%"></span></div>@((attempt.Score ?? 0).ToString("0.0"))</td>
+                <td>@(attempt.SubmittedAt?.ToLocalTime().ToString("dd/MM/yyyy HH:mm") ?? "-")</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</section>
+
+@if (questionStats is not null && questionStats.Count > 0)
+{
+    <section class="panel" style="margin-top:1.5rem">
+        <div class="panel-head"><h2>Tỷ lệ đúng/sai từng câu hỏi</h2></div>
+        <table class="data-table">
+            <thead><tr><th>Câu</th><th>Nội dung</th><th>Loại</th><th>Tổng trả lời</th><th>Đúng</th><th>Sai</th><th>Tỷ lệ đúng</th></tr></thead>
+            <tbody>
+            @foreach (var q in questionStats)
+            {
+                var rate = q.Total == 0 ? 0 : q.Correct * 100 / q.Total;
+                <tr>
+                    <td><b>Q@q.QuestionId</b></td>
+                    <td style="max-width:320px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">@q.Content</td>
+                    <td>@q.Type</td>
+                    <td>@q.Total</td>
+                    <td class="green">@q.Correct</td>
+                    <td class="red">@(q.Total - q.Correct)</td>
+                    <td>
+                        <div class="scorebar"><span style="width:@rate%;background:@(rate >= 70 ? "#0D9488" : rate >= 40 ? "#F97316" : "#EF4444")"></span></div>
+                        @rate%
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </section>
+}

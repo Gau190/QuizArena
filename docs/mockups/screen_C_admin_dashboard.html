@@ -1,0 +1,166 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:var(--font-sans)}
+.w{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden}
+.nav{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-bottom:0.5px solid var(--color-border-tertiary)}
+.logo{font-size:15px;font-weight:500;color:var(--color-text-primary)}
+.logo span{color:#2563EB}
+.p20{padding:20px}
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px}
+.sc{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:14px 16px}
+.sc-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.sc-icon{width:30px;height:30px;border-radius:var(--border-radius-md);display:flex;align-items:center;justify-content:center;font-size:15px}
+.sc-num{font-size:22px;font-weight:500;color:var(--color-text-primary)}
+.sc-label{font-size:11px;color:var(--color-text-secondary)}
+.sc-delta{font-size:11px;margin-top:4px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:16px}
+.card-title{font-size:13px;font-weight:500;color:var(--color-text-primary);margin-bottom:12px;display:flex;align-items:center;justify-content:space-between}
+.sec-link{font-size:11px;color:#2563EB;cursor:pointer}
+.bar-row{display:flex;align-items:center;gap:8px;margin-bottom:7px}
+.bar-label{font-size:12px;color:var(--color-text-secondary);width:70px;flex-shrink:0}
+.bar-bg{flex:1;height:5px;background:var(--color-background-secondary);border-radius:3px;overflow:hidden}
+.bar-f{height:100%;border-radius:3px}
+.bar-val{font-size:12px;font-weight:500;color:var(--color-text-primary);min-width:24px;text-align:right}
+.act-item{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:0.5px solid var(--color-border-tertiary)}
+.act-item:last-child{border-bottom:none}
+.act-icon{width:28px;height:28px;border-radius:var(--border-radius-md);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;margin-top:1px}
+.act-text{font-size:12px;color:var(--color-text-primary);line-height:1.5}
+.act-time{font-size:11px;color:var(--color-text-secondary);margin-top:2px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.alert-item{padding:10px 12px;border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-tertiary);display:flex;gap:9px;align-items:flex-start}
+.al-icon{font-size:15px;flex-shrink:0;margin-top:1px}
+.al-title{font-size:12px;font-weight:500;color:var(--color-text-primary);margin-bottom:2px}
+.al-desc{font-size:11px;color:var(--color-text-secondary);line-height:1.4}
+.mini-chart{display:flex;align-items:flex-end;gap:3px;height:40px;margin-top:8px}
+.mc-bar{flex:1;border-radius:2px 2px 0 0;background:#BFDBFE}
+.mc-bar.hi{background:#2563EB}
+</style>
+<h2 class="sr-only">Dashboard quản trị hệ thống QuizArena — thống kê toàn trường</h2>
+<div class="w">
+  <div class="nav">
+    <div style="display:flex;align-items:center;gap:8px">
+      <span class="logo"><span>Exam</span>Hub</span>
+      <span style="color:var(--color-border-secondary)">/</span>
+      <span style="font-size:13px;color:var(--color-text-secondary)">Tổng quan hệ thống</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <span style="font-size:12px;padding:3px 10px;background:#F1F5F9;color:#334155;border-radius:20px;font-weight:500">Admin</span>
+      <div style="width:28px;height:28px;border-radius:50%;background:#F1F5F9;color:#334155;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500">AD</div>
+    </div>
+  </div>
+
+  <div class="p20">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <div>
+        <div style="font-size:17px;font-weight:500;color:var(--color-text-primary)">Chào buổi sáng, Admin!</div>
+        <div style="font-size:12px;color:var(--color-text-secondary);margin-top:2px">Hôm nay có 3 kỳ thi đang diễn ra · Thứ Tư, 19/03/2025</div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button style="display:flex;align-items:center;gap:5px;font-size:12px;padding:7px 12px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:var(--color-background-primary);cursor:pointer;font-family:var(--font-sans);color:var(--color-text-primary)"><i class="ti ti-download" style="font-size:13px" aria-hidden="true"></i>Xuất báo cáo</button>
+        <button style="display:flex;align-items:center;gap:5px;font-size:12px;font-weight:500;padding:7px 12px;background:#2563EB;color:#EFF6FF;border:none;border-radius:var(--border-radius-md);cursor:pointer;font-family:var(--font-sans)"><i class="ti ti-settings" style="font-size:13px" aria-hidden="true"></i>Cài đặt</button>
+      </div>
+    </div>
+
+    <div class="stat-grid">
+      <div class="sc">
+        <div class="sc-top"><div class="sc-icon" style="background:#EFF6FF"><i class="ti ti-users" style="color:#2563EB" aria-hidden="true"></i></div><i class="ti ti-trending-up" style="font-size:13px;color:#16A34A" aria-hidden="true"></i></div>
+        <div class="sc-num">487</div>
+        <div class="sc-label">Tổng học sinh</div>
+        <div class="sc-delta" style="color:#16A34A">+12 tuần này</div>
+      </div>
+      <div class="sc">
+        <div class="sc-top"><div class="sc-icon" style="background:#DCFCE7"><i class="ti ti-chalkboard" style="color:#16A34A" aria-hidden="true"></i></div></div>
+        <div class="sc-num">18</div>
+        <div class="sc-label">Giáo viên</div>
+        <div class="sc-delta" style="color:var(--color-text-secondary)">4 lớp / giáo viên TB</div>
+      </div>
+      <div class="sc">
+        <div class="sc-top"><div class="sc-icon" style="background:#FFEDD5"><i class="ti ti-clipboard-list" style="color:#C2410C" aria-hidden="true"></i></div><i class="ti ti-circle" style="font-size:10px;color:#EF4444" aria-hidden="true"></i></div>
+        <div class="sc-num">3</div>
+        <div class="sc-label">Kỳ thi đang diễn ra</div>
+        <div class="sc-delta" style="color:#C2410C">324 thí sinh đang thi</div>
+      </div>
+      <div class="sc">
+        <div class="sc-top"><div class="sc-icon" style="background:#F1F5F9"><i class="ti ti-database" style="color:#64748B" aria-hidden="true"></i></div></div>
+        <div class="sc-num">2,841</div>
+        <div class="sc-label">Câu hỏi trong ngân hàng</div>
+        <div class="sc-delta" style="color:#16A34A">+67 tháng này</div>
+      </div>
+    </div>
+
+    <div class="grid2">
+      <div class="card">
+        <div class="card-title">Điểm trung bình theo môn <span class="sec-link">Xem chi tiết</span></div>
+        <div class="bar-row"><span class="bar-label">Toán học</span><div class="bar-bg"><div class="bar-f" style="width:82%;background:#3B82F6"></div></div><span class="bar-val">8.2</span></div>
+        <div class="bar-row"><span class="bar-label">Vật lý</span><div class="bar-bg"><div class="bar-f" style="width:76%;background:#22C55E"></div></div><span class="bar-val">7.6</span></div>
+        <div class="bar-row"><span class="bar-label">Hóa học</span><div class="bar-bg"><div class="bar-f" style="width:74%;background:#F97316"></div></div><span class="bar-val">7.4</span></div>
+        <div class="bar-row"><span class="bar-label">Tiếng Anh</span><div class="bar-bg"><div class="bar-f" style="width:86%;background:#7F77DD"></div></div><span class="bar-val">8.6</span></div>
+        <div class="bar-row"><span class="bar-label">Sinh học</span><div class="bar-bg"><div class="bar-f" style="width:78%;background:#1D9E75"></div></div><span class="bar-val">7.8</span></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Hoạt động gần đây <span class="sec-link">Xem tất cả</span></div>
+        <div class="act-item">
+          <div class="act-icon" style="background:#EFF6FF"><i class="ti ti-clipboard-check" style="color:#2563EB" aria-hidden="true"></i></div>
+          <div><div class="act-text">Kỳ thi Vật lý 12A2 kết thúc — 38 học sinh nộp bài</div><div class="act-time">5 phút trước</div></div>
+        </div>
+        <div class="act-item">
+          <div class="act-icon" style="background:#DCFCE7"><i class="ti ti-user-plus" style="color:#16A34A" aria-hidden="true"></i></div>
+          <div><div class="act-text">Thêm 3 học sinh mới vào lớp 12A1</div><div class="act-time">1 giờ trước</div></div>
+        </div>
+        <div class="act-item">
+          <div class="act-icon" style="background:#FFEDD5"><i class="ti ti-file-plus" style="color:#C2410C" aria-hidden="true"></i></div>
+          <div><div class="act-text">GV Trần Thị Bích thêm 15 câu hỏi Toán mới</div><div class="act-time">2 giờ trước</div></div>
+        </div>
+        <div class="act-item">
+          <div class="act-icon" style="background:#FEE2E2"><i class="ti ti-alert-triangle" style="color:#DC2626" aria-hidden="true"></i></div>
+          <div><div class="act-text">Cảnh báo: Bùi Thanh Liêm chuyển tab 3 lần trong lúc thi</div><div class="act-time">3 giờ trước</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid3">
+      <div class="card">
+        <div class="card-title">Bài thi trong tuần</div>
+        <div class="mini-chart">
+          <div class="mc-bar" style="height:40%"></div>
+          <div class="mc-bar" style="height:65%"></div>
+          <div class="mc-bar hi" style="height:90%"></div>
+          <div class="mc-bar" style="height:50%"></div>
+          <div class="mc-bar hi" style="height:100%"></div>
+          <div class="mc-bar" style="height:30%"></div>
+          <div class="mc-bar" style="height:20%"></div>
+        </div>
+        <div style="font-size:20px;font-weight:500;color:var(--color-text-primary);margin-top:8px">142 <span style="font-size:12px;font-weight:400;color:var(--color-text-secondary)">lượt thi</span></div>
+        <div style="font-size:11px;color:#16A34A">+18% so với tuần trước</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Tỷ lệ đạt toàn trường</div>
+        <div style="display:flex;align-items:center;gap:12px;margin-top:4px">
+          <div style="position:relative;width:60px;height:60px;flex-shrink:0">
+            <svg width="60" height="60" viewBox="0 0 60 60" style="transform:rotate(-90deg)">
+              <circle cx="30" cy="30" r="24" fill="none" stroke="var(--color-background-secondary)" stroke-width="7"/>
+              <circle cx="30" cy="30" r="24" fill="none" stroke="#3B82F6" stroke-width="7" stroke-dasharray="112 39" stroke-linecap="round"/>
+            </svg>
+            <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:500;color:#2563EB">74%</div>
+          </div>
+          <div>
+            <div style="font-size:13px;color:var(--color-text-secondary);margin-bottom:4px">Đạt: <span style="color:#16A34A;font-weight:500">361 / 487</span></div>
+            <div style="font-size:13px;color:var(--color-text-secondary)">Không đạt: <span style="color:#DC2626;font-weight:500">126</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Cảnh báo hệ thống</div>
+        <div class="alert-item" style="background:#FEE2E2;border-color:#FECACA;margin-bottom:7px">
+          <i class="al-icon ti ti-alert-circle" style="color:#DC2626" aria-hidden="true"></i>
+          <div><div class="al-title" style="color:#991B1B">5 học sinh chưa thi</div><div class="al-desc" style="color:#DC2626">Kỳ thi Hóa 12A1 kết thúc hôm qua</div></div>
+        </div>
+        <div class="alert-item" style="background:#FFEDD5;border-color:#FDBA74">
+          <i class="al-icon ti ti-database" style="color:#C2410C" aria-hidden="true"></i>
+          <div><div class="al-title" style="color:#633806">Ngân hàng Sinh học thấp</div><div class="al-desc" style="color:#C2410C">Môn Sinh chỉ có 24 câu — cần bổ sung</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

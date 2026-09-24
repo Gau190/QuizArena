@@ -1,0 +1,52 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuizArena.Core", "src\QuizArena.Core\QuizArena.Core.csproj", "{06C676BD-221D-4C6A-8A67-D68F636A20DB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuizArena.Infrastructure", "src\QuizArena.Infrastructure\QuizArena.Infrastructure.csproj", "{31F985AD-C572-48A9-895B-D46FC5AC7CA6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuizArena.Web", "src\QuizArena.Web\QuizArena.Web.csproj", "{EB648BDA-2CBE-4923-AEF0-7832AB967A3C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuizArena.Api", "src\QuizArena.Api\QuizArena.Api.csproj", "{7923CC46-3B6C-4CA0-A4F9-4665774287E0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuizArena.Tests", "tests\QuizArena.Tests\QuizArena.Tests.csproj", "{0933B0FA-BA07-4E5E-BE11-F83A835D5226}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuizArena.Seeder", "src\QuizArena.Seeder\QuizArena.Seeder.csproj", "{CACC47CE-B128-4486-A603-5FDDDEC8FA69}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{06C676BD-221D-4C6A-8A67-D68F636A20DB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{06C676BD-221D-4C6A-8A67-D68F636A20DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{06C676BD-221D-4C6A-8A67-D68F636A20DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{06C676BD-221D-4C6A-8A67-D68F636A20DB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{31F985AD-C572-48A9-895B-D46FC5AC7CA6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{31F985AD-C572-48A9-895B-D46FC5AC7CA6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{31F985AD-C572-48A9-895B-D46FC5AC7CA6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{31F985AD-C572-48A9-895B-D46FC5AC7CA6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EB648BDA-2CBE-4923-AEF0-7832AB967A3C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EB648BDA-2CBE-4923-AEF0-7832AB967A3C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EB648BDA-2CBE-4923-AEF0-7832AB967A3C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EB648BDA-2CBE-4923-AEF0-7832AB967A3C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7923CC46-3B6C-4CA0-A4F9-4665774287E0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7923CC46-3B6C-4CA0-A4F9-4665774287E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7923CC46-3B6C-4CA0-A4F9-4665774287E0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7923CC46-3B6C-4CA0-A4F9-4665774287E0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0933B0FA-BA07-4E5E-BE11-F83A835D5226}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0933B0FA-BA07-4E5E-BE11-F83A835D5226}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0933B0FA-BA07-4E5E-BE11-F83A835D5226}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0933B0FA-BA07-4E5E-BE11-F83A835D5226}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CACC47CE-B128-4486-A603-5FDDDEC8FA69}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CACC47CE-B128-4486-A603-5FDDDEC8FA69}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CACC47CE-B128-4486-A603-5FDDDEC8FA69}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CACC47CE-B128-4486-A603-5FDDDEC8FA69}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

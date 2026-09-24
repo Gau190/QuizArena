@@ -1,0 +1,157 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans);background:var(--color-background-primary);color:var(--color-text-primary)}
+.topbar{background:var(--color-background-primary);border-bottom:0.5px solid var(--color-border-tertiary);padding:0 20px;display:flex;align-items:center;justify-content:space-between;height:48px}
+.logo{font-size:15px;font-weight:500}.logo em{color:#2563EB;font-style:normal}
+.bc{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--color-text-secondary)}
+.bc .sep{color:var(--color-border-secondary)}.bc .cur{color:var(--color-text-primary);font-weight:500}
+.nav-right{display:flex;align-items:center;gap:8px}
+.role-badge-admin{font-size:11px;padding:3px 10px;border-radius:20px;background:#EFF6FF;color:#1E3A8A;font-weight:500}
+.avatar{width:30px;height:30px;border-radius:50%;background:#EFF6FF;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;color:#2563EB;border:0.5px solid var(--color-border-tertiary)}
+.layout{display:grid;grid-template-columns:200px 1fr;min-height:640px}
+.sidebar{border-right:0.5px solid var(--color-border-tertiary);padding:16px 12px}
+.sb-lbl{font-size:10px;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:.06em;padding:0 8px;margin-bottom:6px;margin-top:14px}
+.sb-item{display:flex;align-items:center;gap:7px;padding:7px 10px;border-radius:6px;cursor:pointer;font-size:13px;color:var(--color-text-secondary);margin-bottom:1px}
+.sb-item:hover{background:var(--color-background-secondary)}
+.sb-item.active{background:#EFF6FF;color:#2563EB;font-weight:500}
+.sb-item i{font-size:14px}
+.main{background:var(--color-background-secondary);padding:20px}
+.section{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:8px;margin-bottom:12px;overflow:hidden}
+.sec-hdr{padding:14px 16px;border-bottom:0.5px solid var(--color-border-tertiary);display:flex;align-items:center;justify-content:space-between}
+.sec-title{font-size:13px;font-weight:500}
+.sec-sub{font-size:11px;color:var(--color-text-secondary);margin-top:1px}
+.sec-body{padding:16px}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.field{display:flex;flex-direction:column;gap:5px}
+.field label{font-size:11px;font-weight:500;color:var(--color-text-secondary)}
+.field input,.field select,.field textarea{font-size:13px;padding:7px 10px;border:0.5px solid var(--color-border-tertiary);border-radius:6px;background:var(--color-background-primary);color:var(--color-text-primary)}
+.field textarea{resize:none;height:60px}
+.toggle-row{display:flex;align-items:flex-start;justify-content:space-between;padding:10px 0;border-bottom:0.5px solid var(--color-border-tertiary)}
+.toggle-row:last-child{border-bottom:none;padding-bottom:0}
+.toggle-info .t-title{font-size:13px;font-weight:500}
+.toggle-info .t-desc{font-size:11px;color:var(--color-text-secondary);margin-top:2px}
+.toggle{position:relative;width:36px;height:20px;flex-shrink:0;margin-top:1px}
+.toggle input{opacity:0;width:0;height:0}
+.slider{position:absolute;inset:0;background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:10px;cursor:pointer;transition:.2s}
+.slider:before{content:'';position:absolute;width:14px;height:14px;left:2px;top:2px;background:var(--color-text-tertiary);border-radius:50%;transition:.2s}
+input:checked+.slider{background:#2563EB;border-color:#2563EB}
+input:checked+.slider:before{transform:translateX(16px);background:#fff}
+.badge-danger{font-size:11px;padding:2px 8px;border-radius:10px;background:#FEE2E2;color:#991B1B}
+.badge-warn{font-size:11px;padding:2px 8px;border-radius:10px;background:#FFEDD5;color:#633806}
+.badge-ok{font-size:11px;padding:2px 8px;border-radius:10px;background:#DCFCE7;color:#166534}
+.btn-save{font-size:12px;padding:7px 18px;border:none;border-radius:6px;background:#2563EB;color:#fff;cursor:pointer;font-weight:500}
+.btn-save:hover{background:#1E3A8A}
+.btn-danger{font-size:12px;padding:7px 18px;border:0.5px solid #EF4444;border-radius:6px;background:var(--color-background-primary);color:#DC2626;cursor:pointer}
+.audit-row{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:0.5px solid var(--color-border-tertiary);font-size:12px}
+.audit-row:last-child{border-bottom:none}
+.audit-icon{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;margin-top:1px}
+.ai-blue{background:#EFF6FF;color:#2563EB}
+.ai-red{background:#FEE2E2;color:#DC2626}
+.ai-green{background:#DCFCE7;color:#16A34A}
+.ai-amber{background:#FFEDD5;color:#C2410C}
+</style>
+<h2 class="sr-only">Màn hình — Cài đặt tổ chức</h2>
+<div class="topbar">
+  <div style="display:flex;align-items:center;gap:14px">
+    <div class="logo"><em>Exam</em>Hub</div>
+    <div class="bc"><span>Trang chủ</span><span class="sep">/</span><span class="cur">Cài đặt tổ chức</span></div>
+  </div>
+  <div class="nav-right">
+    <span class="role-badge-admin">Admin</span>
+    <div class="avatar" style="background:#EFF6FF;color:#2563EB">AD</div>
+  </div>
+</div>
+<div class="layout">
+  <div class="sidebar">
+    <div class="sb-lbl">Tổ chức</div>
+    <div class="sb-item active"><i class="ti ti-building"></i> Thông tin trường</div>
+    <div class="sb-item"><i class="ti ti-calendar"></i> Năm học & Học kỳ</div>
+    <div class="sb-item"><i class="ti ti-users"></i> Phân quyền</div>
+    <div class="sb-lbl">Bảo mật</div>
+    <div class="sb-item"><i class="ti ti-lock"></i> Xác thực & Session</div>
+    <div class="sb-item"><i class="ti ti-shield"></i> Chính sách mật khẩu</div>
+    <div class="sb-item"><i class="ti ti-list-search"></i> Nhật ký kiểm toán</div>
+    <div class="sb-lbl">Hệ thống</div>
+    <div class="sb-item"><i class="ti ti-bell"></i> Thông báo & Email</div>
+    <div class="sb-item"><i class="ti ti-database"></i> Sao lưu & Khôi phục</div>
+    <div class="sb-item"><i class="ti ti-plug"></i> Tích hợp (API)</div>
+  </div>
+  <div class="main">
+    <div class="section">
+      <div class="sec-hdr">
+        <div><div class="sec-title">Thông tin tổ chức</div><div class="sec-sub">Thông tin hiển thị trên học bạ và báo cáo</div></div>
+      </div>
+      <div class="sec-body">
+        <div class="field-row">
+          <div class="field"><label>Tên trường / Trung tâm</label><input type="text" value="THPT Chu Văn An"></div>
+          <div class="field"><label>Mã trường</label><input type="text" value="THPT-CVA-HN01"></div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label>Địa chỉ</label><input type="text" value="Đường Thụy Khuê, Tây Hồ, Hà Nội"></div>
+          <div class="field"><label>Điện thoại</label><input type="text" value="024 3823 1234"></div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label>Email liên hệ</label><input type="text" value="contact@chuvan.edu.vn"></div>
+          <div class="field"><label>Website</label><input type="text" value="https://thptchuvan.edu.vn"></div>
+        </div>
+        <div class="field-row" style="grid-template-columns:1fr">
+          <div class="field"><label>Mô tả ngắn (hiển thị trên học bạ)</label><textarea>Trường THPT Chu Văn An — Hà Nội. Đơn vị trực thuộc Sở GD&ĐT Hà Nội.</textarea></div>
+        </div>
+        <div style="display:flex;justify-content:flex-end"><button class="btn-save">Lưu thay đổi</button></div>
+      </div>
+    </div>
+    <div class="section">
+      <div class="sec-hdr">
+        <div><div class="sec-title">Tính năng hệ thống</div><div class="sec-sub">Bật/tắt các tính năng cho toàn tổ chức</div></div>
+      </div>
+      <div class="sec-body">
+        <div class="toggle-row">
+          <div class="toggle-info"><div class="t-title">Anti-cheat — phát hiện chuyển tab</div><div class="t-desc">Cảnh báo và ghi log khi học sinh rời khỏi trang thi</div></div>
+          <label class="toggle"><input type="checkbox" checked><span class="slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-info"><div class="t-title">Trộn thứ tự câu hỏi & đáp án</div><div class="t-desc">Mỗi thí sinh nhận đề theo thứ tự khác nhau</div></div>
+          <label class="toggle"><input type="checkbox" checked><span class="slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-info"><div class="t-title">Tự động nộp bài khi hết giờ</div><div class="t-desc">Hệ thống sẽ nộp bài tự động, không cần thí sinh xác nhận</div></div>
+          <label class="toggle"><input type="checkbox" checked><span class="slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-info"><div class="t-title">Cho phép xem đáp án sau khi nộp</div><div class="t-desc">Học sinh xem lại câu đúng/sai sau khi hoàn thành bài thi</div></div>
+          <label class="toggle"><input type="checkbox"><span class="slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-info"><div class="t-title">Gửi email kết quả tự động</div><div class="t-desc">Thông báo điểm qua email cho học sinh và phụ huynh</div></div>
+          <label class="toggle"><input type="checkbox" checked><span class="slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-info"><div class="t-title">Chia sẻ ngân hàng câu hỏi giữa giáo viên</div><div class="t-desc">Giáo viên trong cùng tổ chức có thể dùng câu hỏi của nhau</div></div>
+          <label class="toggle"><input type="checkbox" checked><span class="slider"></span></label>
+        </div>
+      </div>
+    </div>
+    <div class="section">
+      <div class="sec-hdr">
+        <div><div class="sec-title">Nhật ký kiểm toán gần đây</div><div class="sec-sub">Ghi lại các hành động nhạy cảm trong hệ thống</div></div>
+        <a href="#" style="font-size:12px;color:#2563EB;text-decoration:none">Xem đầy đủ</a>
+      </div>
+      <div class="sec-body" style="padding:12px 16px">
+        <div class="audit-row"><div class="audit-icon ai-blue"><i class="ti ti-lock" style="font-size:12px"></i></div><div><div style="font-weight:500">Đổi mật khẩu — tài khoản gv_tranvan</div><div style="color:var(--color-text-secondary);margin-top:1px">Thực hiện bởi: admin_root · 02/06/2026 08:41</div></div><span class="badge-ok" style="margin-left:auto;flex-shrink:0">Thành công</span></div>
+        <div class="audit-row"><div class="audit-icon ai-red"><i class="ti ti-user-off" style="font-size:12px"></i></div><div><div style="font-weight:500">Khóa tài khoản — ts_lehoang</div><div style="color:var(--color-text-secondary);margin-top:1px">Thực hiện bởi: admin_root · 28/05/2026 17:30</div></div><span class="badge-danger" style="margin-left:auto;flex-shrink:0">Khóa</span></div>
+        <div class="audit-row"><div class="audit-icon ai-amber"><i class="ti ti-file-export" style="font-size:12px"></i></div><div><div style="font-weight:500">Xuất dữ liệu học bạ — Lớp 12A1 (40 HS)</div><div style="color:var(--color-text-secondary);margin-top:1px">Thực hiện bởi: gv_tranvan · 27/05/2026 14:10</div></div><span class="badge-warn" style="margin-left:auto;flex-shrink:0">Export</span></div>
+        <div class="audit-row"><div class="audit-icon ai-green"><i class="ti ti-user-plus" style="font-size:12px"></i></div><div><div style="font-weight:500">Thêm 3 học sinh mới vào lớp 12A1</div><div style="color:var(--color-text-secondary);margin-top:1px">Thực hiện bởi: admin_root · 26/05/2026 09:05</div></div><span class="badge-ok" style="margin-left:auto;flex-shrink:0">Thành công</span></div>
+      </div>
+    </div>
+    <div class="section">
+      <div class="sec-hdr" style="border-bottom:none">
+        <div><div class="sec-title" style="color:#DC2626">Vùng nguy hiểm</div><div class="sec-sub">Các hành động không thể hoàn tác</div></div>
+      </div>
+      <div class="sec-body" style="display:flex;gap:8px">
+        <button class="btn-danger"><i class="ti ti-trash" style="font-size:13px;vertical-align:-1px;margin-right:4px"></i>Xóa toàn bộ dữ liệu kỳ thi cũ</button>
+        <button class="btn-danger"><i class="ti ti-database-off" style="font-size:13px;vertical-align:-1px;margin-right:4px"></i>Reset hệ thống về mặc định</button>
+      </div>
+    </div>
+  </div>
+</div>

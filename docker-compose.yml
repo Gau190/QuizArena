@@ -6,7 +6,7 @@ services:
       - "8080:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__Default=Server=db;Database=ExamHub;User Id=sa;Password=${DB_PASSWORD};TrustServerCertificate=True
+      - ConnectionStrings__Default=Server=db;Database=QuizArena;User Id=sa;Password=${DB_PASSWORD};TrustServerCertificate=True
       - JWT_SECRET=${JWT_SECRET}
     depends_on:
       db:
@@ -19,7 +19,7 @@ services:
       - "8081:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__Default=Server=db;Database=ExamHub;User Id=sa;Password=${DB_PASSWORD};TrustServerCertificate=True
+      - ConnectionStrings__Default=Server=db;Database=QuizArena;User Id=sa;Password=${DB_PASSWORD};TrustServerCertificate=True
       - JWT_SECRET=${JWT_SECRET}
     depends_on:
       db:

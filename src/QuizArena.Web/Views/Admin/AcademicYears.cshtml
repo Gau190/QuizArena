@@ -1,0 +1,57 @@
+@model AcademicYearsViewModel
+@{
+    ViewData["Title"] = "Năm học & Học kỳ";
+}
+
+<section class="feature-shell">
+    <div class="feature-head">
+        <div>
+            <h1>Năm học & Học kỳ</h1>
+            <p>Phân kỳ thi theo học kỳ, niên khóa và lưu lịch sử điểm qua các năm.</p>
+        </div>
+        <button class="btn primary" type="submit" form="create-term-form"><i class="fa-solid fa-plus"></i> Tạo học kỳ</button>
+    </div>
+
+    @if (TempData["AdminMessage"] is string message)
+    {
+        <div class="alert info">@message</div>
+    }
+
+    <form id="create-term-form" class="inline-form" method="post">
+        @Html.AntiForgeryToken()
+        <input name="academicYear" value="2025-2026" placeholder="Năm học" required />
+        <input name="semester" value="Học kỳ 2" placeholder="Học kỳ" required />
+        <input name="startDate" type="date" value="2026-01-05" required />
+        <input name="endDate" type="date" value="2026-05-31" required />
+    </form>
+
+    <div class="feature-stats">
+        @foreach (var metric in Model.Metrics)
+        {
+            <article class="metric-card @metric.Tone">
+                <span>@metric.Label</span>
+                <b>@metric.Value</b>
+                <small>@metric.Hint</small>
+            </article>
+        }
+    </div>
+
+    <section class="panel">
+        <div class="panel-head tight"><h2>Danh sách phân kỳ</h2></div>
+        <table class="data-table">
+            <thead><tr><th>Năm học</th><th>Học kỳ</th><th>Thời gian</th><th>Kỳ thi</th><th>Trạng thái</th></tr></thead>
+            <tbody>
+            @foreach (var term in Model.Terms)
+            {
+                <tr>
+                    <td><b>@term.AcademicYear</b></td>
+                    <td>@term.Semester</td>
+                    <td>@term.DateRange</td>
+                    <td>@term.ExamCount</td>
+                    <td><span class="status @(term.IsActive ? "ok" : "")"></span>@(term.IsActive ? "Đang mở" : "Lưu trữ")</td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </section>
+</section>

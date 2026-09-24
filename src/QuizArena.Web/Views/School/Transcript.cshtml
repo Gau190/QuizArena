@@ -1,0 +1,105 @@
+@model TranscriptViewModel
+@{
+    ViewData["Title"] = "Học bạ điện tử";
+    var term = Model.Term;
+}
+
+<section class="feature-shell">
+    <div class="feature-head">
+        <div>
+            <h1>Học bạ điện tử</h1>
+            <p>@Model.Profile.Student.FullName · @Model.Profile.ClassName · @Model.Profile.StudentCode</p>
+        </div>
+        <div class="head-actions">
+            <a class="btn ghost" asp-action="StudentProfile" asp-route-id="@Model.Profile.Student.Id"><i class="fa-solid fa-filter"></i> Hồ sơ</a>
+            <a class="btn ghost" asp-action="ExportTranscript" asp-route-id="@Model.Profile.Student.Id"><i class="fa-solid fa-file-excel"></i> Xuất Excel</a>
+            <button class="btn primary" type="button" onclick="window.print()"><i class="fa-solid fa-file-pdf"></i> In/PDF</button>
+        </div>
+    </div>
+
+    <div class="transcript-grid">
+        <aside class="panel transcript-card">
+            <span class="profile-avatar">@Model.Profile.Student.FullName.Split(' ').Last()[0]</span>
+            <h2>@Model.Profile.Student.FullName</h2>
+            <p>@Model.Profile.ClassName · @Model.Profile.StudentCode</p>
+            <div class="profile-badges">
+                <span class="badge student">Học lực: @(Model.Profile.Profile?.AcademicLevel ?? (Model.Profile.AverageScore >= 8 ? "Giỏi" : Model.Profile.AverageScore >= 6.5m ? "Khá" : "Đang cập nhật"))</span>
+                <span class="badge">Hạnh kiểm: @(Model.Profile.Profile?.Conduct ?? "Tốt")</span>
+            </div>
+            <div class="info-list">
+                <div><span>Trường</span><b>QuizArena School</b></div>
+                <div><span>Phụ huynh</span><b>@(Model.Profile.Profile?.ParentName ?? "Chưa cập nhật")</b></div>
+                <div><span>SĐT PH</span><b>@(Model.Profile.Profile?.ParentPhone ?? "Chưa cập nhật")</b></div>
+            </div>
+        </aside>
+
+        <section class="panel">
+            <div class="feature-stats compact-stats">
+                <article class="metric-card primary"><span>Điểm TB</span><b>@Model.Profile.AverageScore.ToString("0.0")</b><small>toàn kỳ</small></article>
+                <article class="metric-card"><span>Bài đã thi</span><b>@Model.Profile.CompletedAttempts</b><small>lượt</small></article>
+                <article class="metric-card success"><span>Tỷ lệ đạt</span><b>@Model.Profile.PassRate%</b><small>điểm từ 5</small></article>
+                <article class="metric-card warning"><span>Xếp hạng lớp</span><b>@Model.RankLabel</b><small>theo điểm TB lớp</small></article>
+            </div>
+
+            <div class="tab-row">
+                <a class="@(term == "1" ? "active" : "")" asp-action="Transcript" asp-route-id="@Model.Profile.Student.Id" asp-route-term="1">Học kỳ 1</a>
+                <a class="@(term == "2" ? "active" : "")" asp-action="Transcript" asp-route-id="@Model.Profile.Student.Id" asp-route-term="2">Học kỳ 2</a>
+                <a class="@(term == "year" ? "active" : "")" asp-action="Transcript" asp-route-id="@Model.Profile.Student.Id" asp-route-term="year">Cả năm</a>
+            </div>
+
+            <table class="data-table transcript-table">
+                <thead>
+                    <tr>
+                        <th>Môn học</th>
+                        @if (term is "1" or "year") { <th>HK1</th> }
+                        @if (term is "2" or "year") { <th>HK2</th> }
+                        @if (term == "year") { <th>Cả năm</th> }
+                        <th>Xếp loại</th>
+                        <th>Ghi chú</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @foreach (var row in Model.Subjects)
+                {
+                    var displayScore = term switch
+                    {
+                        "1" => row.Semester1,
+                        "2" => row.Semester2,
+                        _ => row.FinalScore
+                    };
+                    var displayRank = term switch
+                    {
+                        "1" => row.Semester1 > 0 ? RankLabel(row.Semester1) : "—",
+                        "2" => row.Semester2 > 0 ? RankLabel(row.Semester2) : "—",
+                        _ => row.Rank
+                    };
+                    <tr>
+                        <td><b>@row.Subject</b></td>
+                        @if (term is "1" or "year") { <td>@row.Semester1.ToString("0.0")</td> }
+                        @if (term is "2" or "year") { <td>@row.Semester2.ToString("0.0")</td> }
+                        @if (term == "year") { <td><b>@row.FinalScore.ToString("0.0")</b></td> }
+                        <td><span class="badge subject">@displayRank</span></td>
+                        <td>@row.Attempts bài thi</td>
+                    </tr>
+                }
+                @if (Model.Subjects.Count == 0)
+                {
+                    var colspan = term == "year" ? 6 : term == "1" ? 4 : 4;
+                    <tr><td colspan="@colspan">Chưa có dữ liệu học bạ.</td></tr>
+                }
+                </tbody>
+            </table>
+        </section>
+    </div>
+</section>
+
+@functions {
+    string RankLabel(decimal score)
+    {
+        if (score >= 9) return "Xuất sắc";
+        if (score >= 8) return "Giỏi";
+        if (score >= 6.5m) return "Khá";
+        if (score >= 5) return "Trung bình";
+        return "Yếu";
+    }
+}

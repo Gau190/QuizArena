@@ -1,0 +1,165 @@
+@model AnalyticsReportViewModel
+@{
+    ViewData["Title"] = "Báo cáo & Phân tích";
+    var term = (string?)ViewBag.Term ?? "2";
+}
+
+<section class="feature-shell">
+    <div class="feature-head">
+        <div>
+            <h1>Báo cáo & Phân tích</h1>
+            <p>Tổng quan điểm số, phân phối kết quả, so sánh lớp và câu hỏi cần rà soát.</p>
+        </div>
+        <div class="head-actions">
+            <a class="btn ghost" asp-controller="Teacher" asp-action="WeakQuestions"><i class="fa-solid fa-triangle-exclamation"></i> Câu hỏi yếu</a>
+            <a class="btn ghost" asp-action="ExportReports" asp-route-term="@term"><i class="fa-solid fa-file-excel"></i> Xuất Excel</a>
+            <div class="segmented">
+                <a class="@(term == "1" ? "active" : "")" asp-action="Reports" asp-route-term="1">Học kỳ 1</a>
+                <a class="@(term == "2" ? "active" : "")" asp-action="Reports" asp-route-term="2">Học kỳ 2</a>
+                <a class="@(term == "year" ? "active" : "")" asp-action="Reports" asp-route-term="year">Cả năm</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="analytics-layout">
+        <aside class="side-menu analytics-menu">
+            <b>Báo cáo</b>
+            <a class="active" href="#overview"><i class="fa-solid fa-chart-bar"></i> Tổng quan</a>
+            <a href="#by-class"><i class="fa-solid fa-school"></i> Theo lớp</a>
+            <a href="#top-students"><i class="fa-solid fa-user-graduate"></i> Theo học sinh</a>
+            <a href="#by-subject"><i class="fa-solid fa-book-open"></i> Theo môn</a>
+            <b>Phân tích</b>
+            <a href="#monthly"><i class="fa-solid fa-chart-line"></i> Tiến độ học tập</a>
+            <a asp-controller="Teacher" asp-action="WeakQuestions"><i class="fa-solid fa-circle-exclamation"></i> Câu hỏi yếu</a>
+            <a href="#distribution"><i class="fa-solid fa-layer-group"></i> Phân phối điểm</a>
+            <b>Xuất dữ liệu</b>
+            <a asp-action="ExportReports" asp-route-term="@term"><i class="fa-solid fa-file-excel"></i> Excel</a>
+        </aside>
+
+        <div class="analytics-main">
+            <div id="overview" class="feature-stats">
+                @foreach (var metric in Model.Metrics)
+                {
+                    <article class="metric-card @metric.Tone">
+                        <span>@metric.Label</span>
+                        <b>@metric.Value</b>
+                        <small>@metric.Hint</small>
+                    </article>
+                }
+            </div>
+
+            <div class="feature-grid two">
+                <section id="monthly" class="panel">
+                    <div class="panel-head tight"><h2>Điểm trung bình theo tháng</h2></div>
+                    <div class="mini-chart">
+                        @foreach (var point in Model.MonthlyScores)
+                        {
+                            var height = Math.Max(8, (int)(point.AverageScore * 10));
+                            <div class="chart-col">
+                                <span>@point.AverageScore.ToString("0.0")</span>
+                                <b style="height:@height%" title="@point.Attempts lượt"></b>
+                            </div>
+                        }
+                    </div>
+                    <div class="chart-axis">
+                        @foreach (var point in Model.MonthlyScores)
+                        {
+                            <span>@point.Label</span>
+                        }
+                    </div>
+                </section>
+
+                <section id="distribution" class="panel">
+                    <div class="panel-head tight"><h2>Phân phối điểm</h2></div>
+                    <div class="distribution-list">
+                        @foreach (var item in Model.ScoreDistribution)
+                        {
+                            <div class="distribution-row">
+                                <i style="background:@item.Color"></i>
+                                <span>@item.Label</span>
+                                <div class="bar-bg"><span style="width:@item.Percent%;background:@item.Color"></span></div>
+                                <b>@item.Percent%</b>
+                            </div>
+                        }
+                    </div>
+                </section>
+            </div>
+
+            <div class="feature-grid two">
+                <section id="by-subject" class="panel">
+                    <div class="panel-head tight"><h2>Điểm trung bình theo môn</h2></div>
+                    <div class="bar-list tall">
+                        @foreach (var subject in Model.SubjectMetrics)
+                        {
+                            var width = Math.Min(100, (int)(subject.AverageScore * 10));
+                            <div class="bar-row">
+                                <span class="bar-label">@subject.Name</span>
+                                <div class="bar-bg"><span style="width:@width%;background:@subject.Color"></span></div>
+                                <b>@subject.AverageScore.ToString("0.0")</b>
+                            </div>
+                        }
+                    </div>
+                </section>
+
+                <section id="by-class" class="panel">
+                    <div class="panel-head tight"><h2>So sánh lớp</h2></div>
+                    @if (Model.ClassMetrics.Count == 0)
+                    {
+                        <p class="muted-help">Chưa có dữ liệu lớp từ các lượt thi đã nộp.</p>
+                    }
+                    else
+                    {
+                        <div class="bar-list tall">
+                            @foreach (var item in Model.ClassMetrics)
+                            {
+                                var width = Math.Min(100, (int)(item.AverageScore * 10));
+                                <div class="bar-row">
+                                    <span class="bar-label">@item.ClassName</span>
+                                    <div class="bar-bg"><span style="width:@width%;background:@item.Color"></span></div>
+                                    <b>@item.AverageScore.ToString("0.0")</b>
+                                </div>
+                            }
+                        </div>
+                    }
+                </section>
+            </div>
+
+            <section id="top-students" class="panel">
+                <div class="panel-head tight"><h2>Top học sinh nổi bật</h2></div>
+                <table class="data-table">
+                    <thead><tr><th>#</th><th>Học sinh</th><th>Lớp</th><th>Điểm TB</th><th>Bài thi</th><th>Tỷ lệ đạt</th></tr></thead>
+                    <tbody>
+                    @foreach (var student in Model.TopStudents)
+                    {
+                        <tr>
+                            <td><span class="rank-pill">#@student.Rank</span></td>
+                            <td><b>@student.StudentName</b></td>
+                            <td>@student.ClassName</td>
+                            <td><span class="score-pill @(student.AverageScore >= 8 ? "high" : student.AverageScore >= 6.5m ? "mid" : "low")">@student.AverageScore.ToString("0.0")</span></td>
+                            <td>@student.Attempts</td>
+                            <td>@student.PassRate%</td>
+                        </tr>
+                    }
+                    @if (Model.TopStudents.Count == 0)
+                    {
+                        <tr><td colspan="6">Chưa có học sinh nào hoàn thành bài thi.</td></tr>
+                    }
+                    </tbody>
+                </table>
+            </section>
+
+            <section class="panel">
+                <div class="panel-head tight"><h2>Gợi ý hành động</h2></div>
+                <div class="activity-list">
+                    @foreach (var insight in Model.Insights)
+                    {
+                        <article class="activity-item @insight.Tone">
+                            <span class="activity-icon"><i class="fa-solid @insight.Icon"></i></span>
+                            <div><b>@insight.Text</b><small>@insight.TimeAgo</small></div>
+                        </article>
+                    }
+                </div>
+            </section>
+        </div>
+    </div>
+</section>

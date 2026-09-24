@@ -1,0 +1,39 @@
+@model TeacherProfilesViewModel
+@{
+    ViewData["Title"] = "Hồ sơ giáo viên";
+}
+
+<section class="feature-shell">
+    <div class="feature-head">
+        <div>
+            <h1>Hồ sơ giáo viên</h1>
+            <p>Thông tin chuyên môn, lớp phụ trách và thống kê ngân hàng câu hỏi.</p>
+        </div>
+        <a class="btn primary" asp-action="Users"><i class="fa-solid fa-user-plus"></i> Thêm giáo viên</a>
+    </div>
+
+    <div class="teacher-grid">
+        @foreach (var row in Model.Teachers)
+        {
+            <article class="panel teacher-card">
+                <div class="teacher-head">
+                    <span class="avatar">@row.Teacher.FullName.Split(' ').Last()[0]</span>
+                    <div>
+                        <h2>@row.Teacher.FullName</h2>
+                        <p>@row.EmployeeCode · @row.Degree</p>
+                    </div>
+                </div>
+                <div class="info-list">
+                    <div><span>Email</span><b>@row.Teacher.Email</b></div>
+                    <div><span>Chuyên môn</span><b>@row.Specialization</b></div>
+                    <div><span>Trạng thái</span><b>@(row.Teacher.IsActive ? "Hoạt động" : "Tạm khóa")</b></div>
+                </div>
+                <div class="mini-stats">
+                    <span><b>@row.ClassCount</b> lớp</span>
+                    <span><b>@row.QuestionCount</b> câu hỏi</span>
+                    <span><b>@row.ExamCount</b> kỳ thi</span>
+                </div>
+            </article>
+        }
+    </div>
+</section>

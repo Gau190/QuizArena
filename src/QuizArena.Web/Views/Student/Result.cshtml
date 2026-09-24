@@ -1,0 +1,166 @@
+@using System.Text.Json
+@model ExamAttempt
+@{
+    ViewData["Title"] = "Kết quả bài thi";
+    var allowViewAnswer = (bool?)ViewBag.AllowViewAnswer ?? false;
+    var totalQuestions = Model.Answers.Count;
+    var correct = Model.Answers.Count(x => x.IsCorrect == true);
+    var wrong = totalQuestions - correct;
+    var score = Model.Score ?? 0;
+    var total = Model.TotalPoints ?? 10;
+    var pct = total > 0 ? (int)Math.Round(score / total * 100) : 0;
+    var timeTaken = (int)((Model.SubmittedAt ?? DateTime.UtcNow) - Model.StartedAt).TotalMinutes;
+    var isPassed = total > 0 && score / total * 10 >= (Model.Exam?.PassScore ?? 5);
+    var normalizedScore = total > 0 ? score / total * 10 : 0;
+}
+
+<section class="result-panel">
+    <!-- HEADER -->
+    <div class="result-head">
+        <div>
+            <h1>@Model.Exam?.Title</h1>
+            <p>@Model.Exam?.Subject?.Name · @Model.SubmittedAt?.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</p>
+        </div>
+        <div class="result-head-actions">
+            <a class="btn ghost" asp-action="Dashboard">
+                <i class="fa-solid fa-house"></i> Về trang chủ
+            </a>
+        </div>
+    </div>
+
+    <!-- SCORE HERO -->
+    <div class="result-hero">
+        <div class="result-score-circle @(isPassed ? "passed" : "failed")">
+            <div class="rsc-label">Điểm số</div>
+            <b class="rsc-score">@normalizedScore.ToString("0.0")</b>
+            <span class="rsc-total">/ 10.0</span>
+            <div class="rsc-badge @(isPassed ? "pass" : "fail")">
+                @(isPassed ? "ĐẠT" : "CHƯA ĐẠT")
+            </div>
+        </div>
+
+        <div class="result-meta-grid">
+            <div class="result-meta-card">
+                <i class="fa-solid fa-circle-check" style="color:var(--success)"></i>
+                <div>
+                    <b class="green">@correct</b>
+                    <span>Câu đúng</span>
+                </div>
+            </div>
+            <div class="result-meta-card">
+                <i class="fa-solid fa-circle-xmark" style="color:var(--danger)"></i>
+                <div>
+                    <b class="red">@wrong</b>
+                    <span>Câu sai</span>
+                </div>
+            </div>
+            <div class="result-meta-card">
+                <i class="fa-regular fa-clock" style="color:var(--warning)"></i>
+                <div>
+                    <b>@timeTaken phút</b>
+                    <span>Thời gian làm</span>
+                </div>
+            </div>
+            <div class="result-meta-card">
+                <i class="fa-solid fa-chart-simple" style="color:var(--primary)"></i>
+                <div>
+                    <b>@totalQuestions</b>
+                    <span>Tổng câu hỏi</span>
+                </div>
+            </div>
+
+            <!-- Progress bar -->
+            <div class="result-meta-wide">
+                <div class="result-acc-label">
+                    <span>Độ chính xác</span>
+                    <b>@(totalQuestions > 0 ? (int)Math.Round(correct * 100.0 / totalQuestions) : 0)%</b>
+                </div>
+                <div class="result-acc-bar">
+                    <div class="result-acc-fill @(isPassed ? "passed" : "failed")"
+                         style="width:@(totalQuestions > 0 ? (int)Math.Round(correct * 100.0 / totalQuestions) : 0)%"></div>
+                </div>
+            </div>
+
+            <div class="result-meta-wide">
+                <div class="result-status-row">
+                    <span>Trạng thái</span>
+                    <span class="result-status-badge @Model.Status.ToString().ToLower()">@(Model.Status switch { AttemptStatus.Submitted => "Đã nộp", AttemptStatus.TimedOut => "Hết giờ", AttemptStatus.Flagged => "Bị gắn cờ", _ => Model.Status.ToString() })</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ANSWER REVIEW -->
+    @if (!allowViewAnswer)
+    {
+        <div class="result-blocked">
+            <i class="fa-solid fa-lock"></i>
+            <p>Giáo viên chưa cho phép xem đáp án chi tiết cho kỳ thi này.</p>
+        </div>
+    }
+    else
+    {
+        <div class="result-list-header">
+            <h2>Chi tiết từng câu hỏi</h2>
+        </div>
+        <div class="result-list">
+            @foreach (var (answer, idx) in Model.Answers.OrderBy(x => x.Id).Select((a, i) => (a, i + 1)))
+            {
+                var selected = JsonSerializer.Deserialize<List<int>>(answer.AnswerIds ?? "[]") ?? [];
+                var isOk = answer.IsCorrect == true;
+                <article class="result-item @(isOk ? "ok" : "bad")">
+                    <div class="result-item-index">
+                        <div class="result-icon @(isOk ? "ok" : "bad")">
+                            <i class="fa-solid fa-@(isOk ? "check" : "xmark")"></i>
+                        </div>
+                        <span class="result-q-num">Câu @idx</span>
+                    </div>
+                    <div class="result-item-body">
+                        <div class="result-q-meta">
+                            <span class="badge exam-type-badge">@(answer.Question?.Type switch { QuestionType.SingleChoice => "Một đáp án", QuestionType.MultipleChoice => "Nhiều đáp án", _ => "Điền đáp án" })</span>
+                            <span class="result-pts">@((answer.PointsEarned ?? 0).ToString("0.##")) / @((answer.Question?.Points ?? 1).ToString("0.##")) điểm</span>
+                        </div>
+                        <h3 class="result-q-content">@answer.Question?.Content</h3>
+                        <div class="answers">
+                            @if (answer.Question?.Type == QuestionType.TextAnswer)
+                            {
+                                <span class="answer @(isOk ? "correct" : "wrong")">
+                                    <i class="fa-solid fa-@(isOk ? "check" : "times")"></i>
+                                    Bạn điền: @(string.IsNullOrWhiteSpace(answer.TextInput) ? "(bỏ trống)" : answer.TextInput)
+                                </span>
+                                <span class="answer correct">
+                                    <i class="fa-solid fa-lightbulb"></i>
+                                    Đáp án: @string.Join(", ", answer.Question.Answers.Where(x => x.IsCorrect).Select(x => x.Content))
+                                </span>
+                            }
+                            else if (answer.Question is not null)
+                            {
+                                @foreach (var option in answer.Question.Answers.OrderBy(x => x.OrderIndex))
+                                {
+                                    var isSelectedByStudent = selected.Contains(option.Id);
+                                    var optClass = option.IsCorrect ? "correct" : isSelectedByStudent ? "wrong" : "";
+                                    <span class="answer @optClass">
+                                        @if (option.IsCorrect)
+                                        {
+                                            <i class="fa-solid fa-check"></i>
+                                        }
+                                        else if (isSelectedByStudent)
+                                        {
+                                            <i class="fa-solid fa-times"></i>
+                                        }
+                                        @option.Content
+                                        @if (isSelectedByStudent && !option.IsCorrect) { <em>(đã chọn)</em> }
+                                    </span>
+                                }
+                            }
+                        </div>
+                        @if (!string.IsNullOrWhiteSpace(answer.Question?.Explanation))
+                        {
+                            <p class="result-explain"><b>Giải thích:</b> @answer.Question.Explanation</p>
+                        }
+                    </div>
+                </article>
+            }
+        </div>
+    }
+</section>

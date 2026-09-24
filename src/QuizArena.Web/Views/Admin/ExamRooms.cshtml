@@ -1,0 +1,123 @@
+@model ExamRoomsViewModel
+@{
+    ViewData["Title"] = "Nhóm thi & Phòng thi";
+}
+
+<section class="feature-shell">
+    <div class="feature-head">
+        <div>
+            <h1>Nhóm thi & Phòng thi</h1>
+            <p>Chia học sinh thành ca thi, phòng thi và phân công giám thị cho từng kỳ thi.</p>
+        </div>
+        <div class="head-actions">
+            <form method="post" asp-action="AutoAssignExamRooms">
+                @Html.AntiForgeryToken()
+                <button class="btn ghost" type="submit"><i class="fa-solid fa-layer-group"></i> Tự chia phòng</button>
+            </form>
+            <button class="btn primary" type="submit" form="create-room-form"><i class="fa-solid fa-plus"></i> Tạo ca thi</button>
+        </div>
+    </div>
+
+    @if (TempData["AdminMessage"] is string message)
+    {
+        <div class="alert info">@message</div>
+    }
+
+    <form id="create-room-form" class="inline-form" method="post">
+        @Html.AntiForgeryToken()
+        <select name="examId" required>
+            <option value="">Chọn kỳ thi</option>
+            @foreach (var exam in Model.Exams)
+            {
+                <option value="@exam.Id">@exam.Title</option>
+            }
+        </select>
+        <select name="classId" required>
+            <option value="">Chọn lớp</option>
+            @foreach (var item in Model.Classes)
+            {
+                <option value="@item.Id">@item.Name</option>
+            }
+        </select>
+        <select name="room" required>
+            <option value="">Phòng thi</option>
+            @foreach (var room in new[] { "Phòng 201", "Phòng 202", "Phòng 251", "Phòng 252", "Phòng 301", "Phòng 302", "Phòng Lab 1", "Phòng Lab 2" })
+            {
+                <option>@room</option>
+            }
+        </select>
+        <input name="shift" placeholder="Ca thi" required />
+        <select name="proctorId">
+            <option value="">Chưa phân công giám thị</option>
+            @foreach (var teacher in Model.Teachers)
+            {
+                <option value="@teacher.Id">@teacher.FullName</option>
+            }
+        </select>
+        <select name="status">
+            <option>Sắp diễn ra</option>
+            <option>Đang thi</option>
+            <option>Đã kết thúc</option>
+        </select>
+    </form>
+
+    <section class="panel">
+        <table class="data-table">
+            <thead><tr><th>Kỳ thi</th><th>Lớp/Nhóm</th><th>Phòng</th><th>Ca thi</th><th>Giám thị</th><th>Sĩ số</th><th>Trạng thái</th><th></th></tr></thead>
+            <tbody>
+            @foreach (var room in Model.Rooms)
+            {
+                <tr>
+                    <td>
+                        <form id="room-form-@room.Id" method="post" asp-action="UpdateExamRoom" asp-route-id="@room.Id">
+                            @Html.AntiForgeryToken()
+                        </form>
+                        <select name="examId" form="room-form-@room.Id">
+                            @foreach (var exam in Model.Exams)
+                            {
+                                <option value="@exam.Id" selected="@(exam.Id == room.ExamId)">@exam.Title</option>
+                            }
+                        </select>
+                    </td>
+                    <td>
+                        <select name="classId" form="room-form-@room.Id">
+                            @foreach (var item in Model.Classes)
+                            {
+                                <option value="@item.Id" selected="@(item.Id == room.ClassId)">@item.Name</option>
+                            }
+                        </select>
+                    </td>
+                    <td>
+                        <select name="room" form="room-form-@room.Id">
+                            @foreach (var item in new[] { "Phòng 201", "Phòng 202", "Phòng 251", "Phòng 252", "Phòng 301", "Phòng 302", "Phòng Lab 1", "Phòng Lab 2" })
+                            {
+                                <option selected="@(item == room.Room)">@item</option>
+                            }
+                        </select>
+                    </td>
+                    <td><input class="shift-input" name="shift" form="room-form-@room.Id" value="@room.Shift" /></td>
+                    <td>
+                        <select name="proctorId" form="room-form-@room.Id">
+                            <option value="">Chưa phân công</option>
+                            @foreach (var teacher in Model.Teachers)
+                            {
+                                <option value="@teacher.Id" selected="@(teacher.Id == room.ProctorId)">@teacher.FullName</option>
+                            }
+                        </select>
+                    </td>
+                    <td>@room.Students</td>
+                    <td>
+                        <select name="status" form="room-form-@room.Id">
+                            @foreach (var status in new[] { "Sắp diễn ra", "Đang thi", "Đã kết thúc" })
+                            {
+                                <option selected="@(status == room.Status)">@status</option>
+                            }
+                        </select>
+                    </td>
+                    <td><button class="btn ghost" form="room-form-@room.Id" type="submit">Lưu</button></td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </section>
+</section>

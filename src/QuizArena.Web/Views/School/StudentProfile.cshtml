@@ -1,0 +1,212 @@
+@model StudentProfileViewModel
+@{
+    ViewData["Title"] = "Hồ sơ học sinh";
+    var classes = (IReadOnlyList<QuizArena.Core.Entities.SchoolClass>?)ViewBag.Classes ?? [];
+    var canEdit = User.IsInRole("Admin") || User.IsInRole("Teacher");
+    var isStudent = User.IsInRole("Student");
+    var tab = (string?)ViewBag.Tab ?? "overview";
+    var rankLabel = Model.ClassRank > 0 && Model.ClassStudentCount > 0
+        ? $"#{Model.ClassRank}/{Model.ClassStudentCount}"
+        : "—";
+}
+
+<section class="student-profile">
+    <aside class="profile-side panel">
+        <span class="profile-avatar">@Model.Student.FullName.Split(' ').Last()[0]</span>
+        <h1>@Model.Student.FullName</h1>
+        <p>@Model.ClassName · @Model.StudentCode</p>
+        <div class="profile-badges">
+            <span class="badge student">Học lực: @(Model.Profile?.AcademicLevel ?? (Model.AverageScore >= 8 ? "Giỏi" : Model.AverageScore >= 6.5m ? "Khá" : "Đang cập nhật"))</span>
+            <span class="badge">Hạnh kiểm: @(Model.Profile?.Conduct ?? "Tốt")</span>
+        </div>
+        <div class="info-list">
+            <div><i class="fa-solid fa-envelope"></i><span>@Model.Student.Email</span></div>
+            <div><i class="fa-solid fa-building-columns"></i><span>QuizArena School</span></div>
+            <div><i class="fa-solid fa-calendar"></i><span>Niên khóa 2025-2026</span></div>
+            <div><i class="fa-solid fa-phone"></i><span>@(Model.Profile?.ParentPhone ?? "Chưa cập nhật")</span></div>
+        </div>
+        <a class="btn primary full" asp-action="Transcript" asp-route-id="@Model.Student.Id"><i class="fa-solid fa-file-pdf"></i> Học bạ điện tử</a>
+    </aside>
+
+    <div class="profile-main">
+        <div class="tab-row">
+            <a class="@(tab == "overview" ? "active" : "")" asp-action="StudentProfile" asp-route-id="@Model.Student.Id" asp-route-tab="overview">Tổng quan</a>
+            <a class="@(tab == "history" ? "active" : "")" asp-action="StudentProfile" asp-route-id="@Model.Student.Id" asp-route-tab="history">Lịch sử thi</a>
+            @if (canEdit || isStudent)
+            {
+                <a class="@(tab == "settings" ? "active" : "")" asp-action="StudentProfile" asp-route-id="@Model.Student.Id" asp-route-tab="settings">Cài đặt</a>
+            }
+        </div>
+
+        @if (TempData["SchoolMessage"] is string message)
+        {
+            <div class="alert info">@message</div>
+        }
+
+        @if (tab == "overview")
+        {
+            <div class="feature-stats">
+                <article class="metric-card primary"><span>Điểm TB</span><b>@Model.AverageScore.ToString("0.0")</b><small>/ 10.0</small></article>
+                <article class="metric-card"><span>Bài đã thi</span><b>@Model.CompletedAttempts</b><small>đã có điểm</small></article>
+                <article class="metric-card success"><span>Tỷ lệ đạt</span><b>@Model.PassRate%</b><small>điểm từ 5</small></article>
+                <article class="metric-card warning"><span>Xếp hạng lớp</span><b>@rankLabel</b><small>theo điểm TB lớp</small></article>
+            </div>
+
+            <section class="panel">
+                <div class="panel-head tight"><h2>Tiến độ điểm theo tháng</h2></div>
+                <div class="mini-chart profile-monthly-chart">
+                    @foreach (var point in Model.MonthlyScores)
+                    {
+                        var height = Math.Max(8, (int)(point.AverageScore * 10));
+                        <div class="chart-col">
+                            <span>@point.AverageScore.ToString("0.0")</span>
+                            <b style="height:@height%"></b>
+                        </div>
+                    }
+                </div>
+                <div class="chart-axis">
+                    @foreach (var point in Model.MonthlyScores)
+                    {
+                        <span>@point.Label</span>
+                    }
+                </div>
+            </section>
+
+            <section class="panel">
+                <div class="panel-head tight"><h2>Điểm theo môn học</h2></div>
+                <div class="score-list">
+                    @foreach (var row in Model.SubjectScores.DefaultIfEmpty(new StudentScoreRow("Chưa có lượt thi", 0, 0, "-", "#3B82F6")))
+                    {
+                        var width = Math.Min(100, (int)(row.AverageScore * 10));
+                        <article class="score-row">
+                            <div><b>@row.Subject</b><small>@row.Attempts lần thi · gần nhất: @row.LastAttempt</small></div>
+                            <div class="scorebar"><span style="width:@width%;background:@row.Color"></span></div>
+                            <strong>@row.AverageScore.ToString("0.0")</strong>
+                        </article>
+                    }
+                </div>
+            </section>
+
+            @if (Model.ClassStudentCount > 0)
+            {
+                <section class="panel profile-compare">
+                    <div class="panel-head tight"><h2>So sánh với lớp</h2></div>
+                    <div class="compare-row">
+                        <div class="compare-head"><span>Học sinh này</span><b>@Model.AverageScore.ToString("0.0")</b></div>
+                        <div class="scorebar"><span style="width:@(Math.Min(100, (int)(Model.AverageScore * 10)))%;background:#3B82F6"></span></div>
+                    </div>
+                    <div class="compare-row">
+                        <div class="compare-head"><span>Trung bình lớp (@Model.ClassName)</span><b>@Model.ClassAverageScore.ToString("0.0")</b></div>
+                        <div class="scorebar"><span style="width:@(Math.Min(100, (int)(Model.ClassAverageScore * 10)))%;background:#D1D5DB"></span></div>
+                    </div>
+                </section>
+            }
+        }
+
+        @if (tab == "history")
+        {
+            <section class="panel">
+                <div class="panel-head tight"><h2>Lịch sử thi</h2></div>
+                <table class="data-table">
+                    <thead><tr><th>Kỳ thi</th><th>Môn</th><th>Trạng thái</th><th>Điểm</th><th>Nộp lúc</th><th></th></tr></thead>
+                    <tbody>
+                    @foreach (var attempt in Model.Attempts)
+                    {
+                        <tr>
+                            <td><b>@attempt.Exam?.Title</b></td>
+                            <td>@attempt.Exam?.Subject?.Name</td>
+                            <td>@attempt.Status</td>
+                            <td>@((attempt.Score ?? 0).ToString("0.0"))</td>
+                            <td>@(attempt.SubmittedAt?.ToLocalTime().ToString("dd/MM/yyyy HH:mm") ?? "-")</td>
+                            <td>
+                                @if (attempt.Status != AttemptStatus.InProgress)
+                                {
+                                    <a asp-controller="Student" asp-action="Result" asp-route-attemptId="@attempt.Id">Chi tiết</a>
+                                }
+                            </td>
+                        </tr>
+                    }
+                    @if (Model.Attempts.Count == 0)
+                    {
+                        <tr><td colspan="6">Chưa có lượt thi nào.</td></tr>
+                    }
+                    </tbody>
+                </table>
+            </section>
+        }
+
+        @if (tab == "settings" && isStudent)
+        {
+            <section class="panel">
+                <div class="panel-head tight"><h2>Cài đặt tài khoản</h2></div>
+                <form class="profile-edit-form" method="post" asp-action="UpdateStudentSettings">
+                    @Html.AntiForgeryToken()
+                    <label>Email<input name="email" type="email" value="@Model.Student.Email" required /></label>
+                    <label>Mật khẩu hiện tại<input name="currentPassword" type="password" autocomplete="current-password" /></label>
+                    <label>Mật khẩu mới<input name="newPassword" type="password" autocomplete="new-password" /></label>
+                    <label>Xác nhận mật khẩu mới<input name="confirmPassword" type="password" autocomplete="new-password" /></label>
+                    <p class="muted full">Để trống mật khẩu nếu chỉ muốn đổi email.</p>
+                    <div class="form-actions full">
+                        <button class="btn primary" type="submit"><i class="fa-solid fa-floppy-disk"></i> Lưu cài đặt</button>
+                    </div>
+                </form>
+            </section>
+        }
+
+        @if (tab == "settings" && canEdit)
+        {
+            <section class="panel">
+                <div class="panel-head tight"><h2>Chỉnh sửa hồ sơ</h2></div>
+                <form class="profile-edit-form" method="post" asp-action="UpdateStudentProfile" asp-route-id="@Model.Student.Id">
+                    @Html.AntiForgeryToken()
+                    <label>Họ tên<input name="fullName" value="@Model.Student.FullName" required /></label>
+                    <label>Email<input name="email" type="email" value="@Model.Student.Email" required /></label>
+                    <label>Mã học sinh<input name="studentCode" value="@Model.StudentCode" required /></label>
+                    <label>Giới tính
+                        <select name="gender">
+                            <option value="">Chưa chọn</option>
+                            @foreach (var gender in new[] { "Nam", "Nữ", "Khác" })
+                            {
+                                <option selected="@(gender == Model.Profile?.Gender)">@gender</option>
+                            }
+                        </select>
+                    </label>
+                    <label>Ngày sinh<input name="dateOfBirth" type="date" value="@Model.Profile?.DateOfBirth?.ToString("yyyy-MM-dd")" /></label>
+                    <label>Lớp hiện tại
+                        <select name="classId">
+                            <option value="">Chưa xếp lớp</option>
+                            @foreach (var item in classes)
+                            {
+                                <option value="@item.Id" selected="@(item.Name == Model.ClassName)">@item.Name</option>
+                            }
+                        </select>
+                    </label>
+                    <label>Phụ huynh<input name="parentName" value="@Model.Profile?.ParentName" /></label>
+                    <label>SĐT phụ huynh<input name="parentPhone" value="@Model.Profile?.ParentPhone" /></label>
+                    <label>Email phụ huynh<input name="parentEmail" type="email" value="@Model.Profile?.ParentEmail" /></label>
+                    <label>Hạnh kiểm
+                        <select name="conduct">
+                            @foreach (var conduct in new[] { "Tốt", "Khá", "Trung bình", "Cần theo dõi" })
+                            {
+                                <option selected="@(conduct == (Model.Profile?.Conduct ?? "Tốt"))">@conduct</option>
+                            }
+                        </select>
+                    </label>
+                    <label>Học lực
+                        <select name="academicLevel">
+                            <option value="">Tự động theo điểm</option>
+                            @foreach (var level in new[] { "Xuất sắc", "Giỏi", "Khá", "Trung bình", "Yếu" })
+                            {
+                                <option selected="@(level == Model.Profile?.AcademicLevel)">@level</option>
+                            }
+                        </select>
+                    </label>
+                    <label class="full">Địa chỉ<input name="address" value="@Model.Profile?.Address" /></label>
+                    <div class="form-actions full">
+                        <button class="btn primary" type="submit"><i class="fa-solid fa-floppy-disk"></i> Lưu hồ sơ</button>
+                    </div>
+                </form>
+            </section>
+        }
+    </div>
+</section>

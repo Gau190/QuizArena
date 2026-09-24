@@ -1,0 +1,168 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans);background:var(--color-background-primary);color:var(--color-text-primary)}
+.topbar{background:var(--color-background-primary);border-bottom:0.5px solid var(--color-border-tertiary);padding:0 20px;display:flex;align-items:center;justify-content:space-between;height:48px}
+.logo{font-size:15px;font-weight:500}.logo em{color:#2563EB;font-style:normal}
+.breadcrumb{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--color-text-secondary)}
+.breadcrumb .sep{color:var(--color-text-tertiary)}
+.breadcrumb .cur{color:var(--color-text-primary);font-weight:500}
+.nav-right{display:flex;align-items:center;gap:8px}
+.role-badge{font-size:11px;padding:3px 10px;border-radius:20px;background:#DCFCE7;color:#166534;font-weight:500}
+.avatar{width:30px;height:30px;border-radius:50%;background:#EFF6FF;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;color:#2563EB;border:0.5px solid var(--color-border-tertiary)}
+.layout{display:grid;grid-template-columns:200px 1fr;min-height:620px}
+.sidebar{border-right:0.5px solid var(--color-border-tertiary);padding:16px 12px}
+.sb-lbl{font-size:10px;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:.06em;padding:0 8px;margin-bottom:6px;margin-top:14px}
+.sb-item{display:flex;align-items:center;gap:7px;padding:7px 10px;border-radius:6px;cursor:pointer;font-size:13px;color:var(--color-text-secondary);margin-bottom:1px}
+.sb-item:hover{background:var(--color-background-secondary)}
+.sb-item.active{background:#EFF6FF;color:#2563EB;font-weight:500}
+.sb-item i{font-size:14px}
+.main{background:var(--color-background-secondary);padding:18px}
+.page-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.page-title{font-size:15px;font-weight:500}
+.filters{display:flex;gap:6px}
+.flt{font-size:12px;padding:5px 12px;border:0.5px solid var(--color-border-tertiary);border-radius:6px;background:var(--color-background-primary);color:var(--color-text-secondary);cursor:pointer}
+.flt.active{border-color:#2563EB;color:#2563EB;background:#EFF6FF;font-weight:500}
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+.sc{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:8px;padding:12px 14px}
+.sc-lbl{font-size:11px;color:var(--color-text-secondary);margin-bottom:3px}
+.sc-val{font-size:22px;font-weight:500;color:var(--color-text-primary)}
+.sc-sub{font-size:11px;color:var(--color-text-secondary);margin-top:2px}
+.sc-sub.up{color:#16A34A}.sc-sub.dn{color:#DC2626}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:8px;padding:14px}
+.card-title{font-size:12px;font-weight:500;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.04em;margin-bottom:12px}
+.bar-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.bar-lbl{font-size:12px;color:var(--color-text-secondary);width:80px;flex-shrink:0;text-align:right}
+.bar-wrap{flex:1;height:8px;background:var(--color-background-secondary);border-radius:4px;overflow:hidden}
+.bar-fill{height:8px;border-radius:4px}
+.bar-val{font-size:12px;font-weight:500;width:30px;text-align:right;flex-shrink:0}
+.chart-area{position:relative;height:110px;display:flex;align-items:flex-end;gap:4px;border-bottom:0.5px solid var(--color-border-tertiary);padding-bottom:0;margin-bottom:20px}
+.bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+.bar-col .bc-bar{width:100%;border-radius:3px 3px 0 0;background:#BFDBFE}
+.bar-col.hi .bc-bar{background:#2563EB}
+.bar-col .bc-lbl{font-size:10px;color:var(--color-text-tertiary);margin-top:6px}
+.bar-col .bc-val{font-size:10px;color:var(--color-text-secondary);position:absolute;top:-14px;width:100%;text-align:center}
+.dist-row{display:flex;align-items:center;gap:8px;margin-bottom:7px}
+.dist-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.dist-lbl{font-size:12px;color:var(--color-text-secondary);flex:1}
+.dist-bar{flex:2;height:6px;background:var(--color-background-secondary);border-radius:3px;overflow:hidden}
+.dist-fill{height:6px;border-radius:3px}
+.dist-val{font-size:12px;font-weight:500;width:28px;text-align:right}
+.full-card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:8px;padding:14px;margin-bottom:10px}
+.tbl{width:100%;border-collapse:collapse;font-size:12px}
+.tbl th{text-align:left;font-size:10px;font-weight:500;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:.04em;padding:0 8px 8px}
+.tbl td{padding:8px;border-top:0.5px solid var(--color-border-tertiary);color:var(--color-text-primary);font-size:12px}
+.tbl tr:hover td{background:var(--color-background-secondary)}
+.rank{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500}
+.r1{background:#FFEDD5;color:#633806}.r2{background:#F1EFE8;color:#444441}.r3{background:#EFF6FF;color:#1E3A8A}
+.score-pill{font-size:11px;padding:2px 8px;border-radius:10px}
+.pill-hi{background:#DCFCE7;color:#166534}.pill-md{background:#FFEDD5;color:#633806}.pill-lo{background:#FEE2E2;color:#991B1B}
+.export-row{display:flex;gap:8px;margin-top:10px}
+.btn-outline{font-size:12px;padding:6px 14px;border:0.5px solid var(--color-border-tertiary);border-radius:6px;background:var(--color-background-primary);color:var(--color-text-secondary);cursor:pointer;display:flex;align-items:center;gap:5px}
+.btn-outline:hover{background:var(--color-background-secondary)}
+.btn-primary{font-size:12px;padding:6px 14px;border:none;border-radius:6px;background:#2563EB;color:#fff;cursor:pointer;display:flex;align-items:center;gap:5px;font-weight:500}
+</style>
+<h2 class="sr-only">Màn hình — Báo cáo & Phân tích</h2>
+<div class="topbar">
+  <div style="display:flex;align-items:center;gap:14px">
+    <div class="logo"><em>Exam</em>Hub</div>
+    <div class="breadcrumb"><span>Trang chủ</span><span class="sep">/</span><span class="cur">Báo cáo & Phân tích</span></div>
+  </div>
+  <div class="nav-right">
+    <span class="role-badge">Giáo viên</span>
+    <div class="avatar">GV</div>
+  </div>
+</div>
+<div class="layout">
+  <div class="sidebar">
+    <div class="sb-lbl">Báo cáo</div>
+    <div class="sb-item active"><i class="ti ti-chart-bar"></i> Tổng quan</div>
+    <div class="sb-item"><i class="ti ti-school"></i> Theo lớp</div>
+    <div class="sb-item"><i class="ti ti-user"></i> Theo học sinh</div>
+    <div class="sb-item"><i class="ti ti-file-text"></i> Theo kỳ thi</div>
+    <div class="sb-lbl">Phân tích</div>
+    <div class="sb-item"><i class="ti ti-trending-up"></i> Tiến độ học tập</div>
+    <div class="sb-item"><i class="ti ti-alert-circle"></i> Câu hỏi yếu</div>
+    <div class="sb-item"><i class="ti ti-users"></i> So sánh lớp</div>
+    <div class="sb-lbl">Xuất dữ liệu</div>
+    <div class="sb-item"><i class="ti ti-file-spreadsheet"></i> Excel</div>
+    <div class="sb-item"><i class="ti ti-file-description"></i> PDF học bạ</div>
+  </div>
+  <div class="main">
+    <div class="page-hdr">
+      <div class="page-title">Tổng quan — Học kỳ 2, 2024–2025</div>
+      <div class="filters">
+        <button class="flt">Học kỳ 1</button>
+        <button class="flt active">Học kỳ 2</button>
+        <button class="flt">Cả năm</button>
+      </div>
+    </div>
+    <div class="stat-row">
+      <div class="sc"><div class="sc-lbl">Tổng kỳ thi</div><div class="sc-val">24</div><div class="sc-sub up">↑ 4 so HK1</div></div>
+      <div class="sc"><div class="sc-lbl">Lượt dự thi</div><div class="sc-val">638</div><div class="sc-sub up">↑ 12%</div></div>
+      <div class="sc"><div class="sc-lbl">Điểm trung bình</div><div class="sc-val" style="color:#2563EB">7.4</div><div class="sc-sub up">↑ 0.3 so HK1</div></div>
+      <div class="sc"><div class="sc-lbl">Tỷ lệ đạt (≥5)</div><div class="sc-val" style="color:#16A34A">91%</div><div class="sc-sub up">↑ 3%</div></div>
+    </div>
+    <div class="grid2">
+      <div class="card">
+        <div class="card-title">Điểm trung bình theo tháng</div>
+        <div style="position:relative">
+          <div class="chart-area">
+            <div class="bar-col" style="position:relative"><span class="bc-val" style="top:-14px;font-size:10px;color:var(--color-text-secondary)">6.8</span><div class="bc-bar" style="height:62%"></div><span class="bc-lbl">Th.1</span></div>
+            <div class="bar-col" style="position:relative"><span class="bc-val" style="top:-14px;font-size:10px;color:var(--color-text-secondary)">7.1</span><div class="bc-bar" style="height:68%"></div><span class="bc-lbl">Th.2</span></div>
+            <div class="bar-col" style="position:relative"><span class="bc-val" style="top:-14px;font-size:10px;color:var(--color-text-secondary)">7.0</span><div class="bc-bar" style="height:65%"></div><span class="bc-lbl">Th.3</span></div>
+            <div class="bar-col" style="position:relative"><span class="bc-val" style="top:-14px;font-size:10px;color:var(--color-text-secondary)">7.3</span><div class="bc-bar" style="height:71%"></div><span class="bc-lbl">Th.4</span></div>
+            <div class="bar-col hi" style="position:relative"><span class="bc-val" style="top:-14px;font-size:10px;color:var(--color-text-secondary)">7.6</span><div class="bc-bar" style="height:78%"></div><span class="bc-lbl">Th.5</span></div>
+            <div class="bar-col hi" style="position:relative"><span class="bc-val" style="top:-14px;font-size:10px;color:var(--color-text-secondary)">7.4</span><div class="bc-bar" style="height:74%"></div><span class="bc-lbl">Th.6</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Phân phối điểm — toàn trường</div>
+        <div class="dist-row"><div class="dist-dot" style="background:#2563EB"></div><span class="dist-lbl">Xuất sắc (9–10)</span><div class="dist-bar"><div class="dist-fill" style="width:18%;background:#2563EB"></div></div><span class="dist-val" style="color:#2563EB">18%</span></div>
+        <div class="dist-row"><div class="dist-dot" style="background:#16A34A"></div><span class="dist-lbl">Giỏi (8–8.9)</span><div class="dist-bar"><div class="dist-fill" style="width:32%;background:#16A34A"></div></div><span class="dist-val" style="color:#16A34A">32%</span></div>
+        <div class="dist-row"><div class="dist-dot" style="background:#C2410C"></div><span class="dist-lbl">Khá (6.5–7.9)</span><div class="dist-bar"><div class="dist-fill" style="width:28%;background:#C2410C"></div></div><span class="dist-val" style="color:#C2410C">28%</span></div>
+        <div class="dist-row"><div class="dist-dot" style="background:#888780"></div><span class="dist-lbl">TB (5–6.4)</span><div class="dist-bar"><div class="dist-fill" style="width:13%;background:#888780"></div></div><span class="dist-val" style="color:#5F5E5A">13%</span></div>
+        <div class="dist-row"><div class="dist-dot" style="background:#DC2626"></div><span class="dist-lbl">Yếu (dưới 5)</span><div class="dist-bar"><div class="dist-fill" style="width:9%;background:#DC2626"></div></div><span class="dist-val" style="color:#DC2626">9%</span></div>
+      </div>
+    </div>
+    <div class="grid2">
+      <div class="card">
+        <div class="card-title">Điểm TB theo môn</div>
+        <div class="bar-row"><span class="bar-lbl">Toán học</span><div class="bar-wrap"><div class="bar-fill" style="width:78%;background:#2563EB"></div></div><span class="bar-val" style="color:#2563EB">7.8</span></div>
+        <div class="bar-row"><span class="bar-lbl">Tiếng Anh</span><div class="bar-wrap"><div class="bar-fill" style="width:76%;background:#64748B"></div></div><span class="bar-val" style="color:#64748B">7.6</span></div>
+        <div class="bar-row"><span class="bar-lbl">Vật lý</span><div class="bar-wrap"><div class="bar-fill" style="width:72%;background:#16A34A"></div></div><span class="bar-val" style="color:#16A34A">7.2</span></div>
+        <div class="bar-row"><span class="bar-lbl">Hóa học</span><div class="bar-wrap"><div class="bar-fill" style="width:65%;background:#C2410C"></div></div><span class="bar-val" style="color:#C2410C">6.5</span></div>
+      </div>
+      <div class="card">
+        <div class="card-title">So sánh lớp — Điểm TB</div>
+        <div class="bar-row"><span class="bar-lbl">12A1</span><div class="bar-wrap"><div class="bar-fill" style="width:82%;background:#2563EB"></div></div><span class="bar-val" style="color:#2563EB">8.2</span></div>
+        <div class="bar-row"><span class="bar-lbl">12A4</span><div class="bar-wrap"><div class="bar-fill" style="width:85%;background:#2563EB"></div></div><span class="bar-val" style="color:#2563EB">8.5</span></div>
+        <div class="bar-row"><span class="bar-lbl">12A3</span><div class="bar-wrap"><div class="bar-fill" style="width:80%;background:#16A34A"></div></div><span class="bar-val" style="color:#16A34A">8.0</span></div>
+        <div class="bar-row"><span class="bar-lbl">12A2</span><div class="bar-wrap"><div class="bar-fill" style="width:79%;background:#16A34A"></div></div><span class="bar-val" style="color:#16A34A">7.9</span></div>
+      </div>
+    </div>
+    <div class="full-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <span class="card-title" style="margin-bottom:0">Top học sinh nổi bật — Học kỳ 2</span>
+        <a href="#" style="font-size:11px;color:#2563EB;text-decoration:none">Xem tất cả</a>
+      </div>
+      <table class="tbl">
+        <thead><tr><th>#</th><th>Học sinh</th><th>Lớp</th><th>Điểm TB</th><th>Bài thi</th><th>Tỷ lệ đạt</th></tr></thead>
+        <tbody>
+          <tr><td><div class="rank r1">1</div></td><td style="font-weight:500">Nguyễn Thị Thanh</td><td>12A1</td><td><span class="score-pill pill-hi">9.1</span></td><td>24</td><td>100%</td></tr>
+          <tr><td><div class="rank r1">2</div></td><td style="font-weight:500">Phạm Minh Hoàng</td><td>12A1</td><td><span class="score-pill pill-hi">8.8</span></td><td>22</td><td>100%</td></tr>
+          <tr><td><div class="rank r2">3</div></td><td style="font-weight:500">Lê Ngọc Tuyết</td><td>12A1</td><td><span class="score-pill pill-hi">8.5</span></td><td>21</td><td>95%</td></tr>
+          <tr><td><div class="rank" style="background:#F1EFE8;color:#444441">4</div></td><td style="font-weight:500">Nguyễn Văn An</td><td>12A4</td><td><span class="score-pill pill-hi">8.3</span></td><td>20</td><td>95%</td></tr>
+          <tr><td><div class="rank" style="background:#F1EFE8;color:#444441">5</div></td><td style="font-weight:500">Trần Minh Khoa</td><td>12A2</td><td><span class="score-pill pill-md">7.9</span></td><td>19</td><td>89%</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="export-row">
+      <button class="btn-outline"><i class="ti ti-file-spreadsheet" style="font-size:13px"></i> Xuất Excel</button>
+      <button class="btn-outline"><i class="ti ti-file-description" style="font-size:13px"></i> Xuất PDF</button>
+      <button class="btn-primary"><i class="ti ti-send" style="font-size:13px"></i> Gửi báo cáo cho Ban giám hiệu</button>
+    </div>
+  </div>
+</div>

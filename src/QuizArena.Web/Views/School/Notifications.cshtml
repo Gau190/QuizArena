@@ -1,0 +1,239 @@
+@model NotificationsViewModel
+@{
+    ViewData["Title"] = "Trung tâm thông báo";
+    var canCompose = User.IsInRole("Admin") || User.IsInRole("Teacher");
+    var activeCategory = (string?)ViewBag.Category;
+    var activeBox = (string?)ViewBag.Box;
+
+    // Tone → icon + bg color mapping
+    static (string Bg, string Icon, string IColor) ToneInfo(string tone) => tone switch {
+        "danger"  => ("#FEE2E2", "fa-triangle-exclamation", "#DC2626"),
+        "warning" => ("#FFEDD5", "fa-clock",               "#C2410C"),
+        "success" => ("#DCFCE7", "fa-circle-check",        "#16A34A"),
+        "purple"  => ("#F1F5F9", "fa-database",             "#64748B"),
+        _         => ("#EFF6FF", "fa-chart-bar",           "#2563EB"),
+    };
+}
+
+<div class="notif-shell">
+    <!-- ── LEFT SIDEBAR ── -->
+    <aside class="notif-sidebar">
+        @if (canCompose)
+        {
+            <button class="notif-compose-trigger btn primary full" id="notif-compose-toggle">
+                <i class="fa-solid fa-plus"></i> Soạn thông báo mới
+            </button>
+        }
+
+        <div class="notif-sb-sec">Hộp thư</div>
+        <a class="notif-nav-item @(activeBox is null && activeCategory is null ? "active" : "")"
+           asp-action="Notifications">
+            <span class="notif-nav-label"><i class="fa-solid fa-inbox"></i> Tất cả</span>
+            @if (Model.Items.Count > 0)
+            { <span class="notif-count-badge" style="background:#EFF6FF;color:#1E3A8A">@Model.Items.Count</span> }
+        </a>
+        <a class="notif-nav-item @(activeBox == "unread" ? "active" : "")"
+           asp-action="Notifications" asp-route-box="unread">
+            <span class="notif-nav-label"><i class="fa-solid fa-circle-dot"></i> Chưa đọc</span>
+            @if (Model.UnreadCount > 0)
+            { <span class="notif-count-badge" style="background:#FEE2E2;color:#DC2626">@Model.UnreadCount</span> }
+        </a>
+        @if (canCompose)
+        {
+            <a class="notif-nav-item @(activeBox == "sent" ? "active" : "")"
+               asp-action="Notifications" asp-route-box="sent">
+                <span class="notif-nav-label"><i class="fa-solid fa-paper-plane"></i> Đã gửi</span>
+            </a>
+        }
+        <a class="notif-nav-item" asp-action="Notifications" asp-route-box="archived">
+            <span class="notif-nav-label"><i class="fa-solid fa-box-archive"></i> Lưu trữ</span>
+        </a>
+
+        <div class="notif-sb-sec">Loại thông báo</div>
+        <a class="notif-nav-item @(activeCategory == "Kỳ thi" ? "active" : "")"
+           asp-action="Notifications" asp-route-category="Kỳ thi">
+            <span class="notif-nav-label"><i class="fa-solid fa-clipboard-list"></i> Kỳ thi</span>
+            @{ var examCnt = Model.Items.Count(x => x.Category == "Kỳ thi"); }
+            @if (examCnt > 0)
+            { <span class="notif-count-badge" style="background:#EFF6FF;color:#1E3A8A">@examCnt</span> }
+        </a>
+        <a class="notif-nav-item @(activeCategory == "Kết quả" ? "active" : "")"
+           asp-action="Notifications" asp-route-category="Kết quả">
+            <span class="notif-nav-label"><i class="fa-solid fa-chart-bar"></i> Kết quả</span>
+        </a>
+        <a class="notif-nav-item @(activeCategory == "Cảnh báo" ? "active" : "")"
+           asp-action="Notifications" asp-route-category="Cảnh báo">
+            <span class="notif-nav-label"><i class="fa-solid fa-triangle-exclamation" style="color:#EF4444"></i> Khẩn cấp</span>
+            @{ var urgentCnt = Model.Items.Count(x => x.Category == "Cảnh báo"); }
+            @if (urgentCnt > 0)
+            { <span class="notif-count-badge" style="background:#FEE2E2;color:#DC2626">@urgentCnt</span> }
+        </a>
+        <a class="notif-nav-item @(activeCategory == "Hệ thống" ? "active" : "")"
+           asp-action="Notifications" asp-route-category="Hệ thống">
+            <span class="notif-nav-label"><i class="fa-solid fa-gear"></i> Hệ thống</span>
+        </a>
+
+        @if (canCompose)
+        {
+            <div class="notif-sb-sec">Gửi tới</div>
+            <a class="notif-nav-item" asp-action="Notifications" asp-route-box="school">
+                <span class="notif-nav-label"><i class="fa-solid fa-building"></i> Toàn trường</span>
+            </a>
+            <a class="notif-nav-item" asp-action="Notifications" asp-route-box="class">
+                <span class="notif-nav-label"><i class="fa-solid fa-users"></i> Theo lớp</span>
+            </a>
+            <a class="notif-nav-item" asp-action="Notifications" asp-route-box="personal">
+                <span class="notif-nav-label"><i class="fa-solid fa-user"></i> Cá nhân</span>
+            </a>
+        }
+    </aside>
+
+    <!-- ── RIGHT MAIN ── -->
+    <section class="panel notif-main">
+        <!-- Main header -->
+        <div class="notif-main-head">
+            <span class="notif-main-title">
+                Tất cả thông báo
+                <span class="muted">(@Model.Items.Count thông báo)</span>
+            </span>
+            <div class="head-actions">
+                <form method="post" asp-action="MarkNotificationsRead">
+                    @Html.AntiForgeryToken()
+                    <button class="btn ghost" type="submit">
+                        <i class="fa-solid fa-check-double"></i> Đánh dấu đã đọc
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        @if (TempData["SchoolMessage"] is string message)
+        {
+            <div class="alert info" style="margin:12px 20px 0">@message</div>
+        }
+
+        <!-- Compose box (collapsible, visible for Admin/Teacher) -->
+        @if (canCompose)
+        {
+            <div class="notif-compose-box" id="notif-compose-box">
+                <div class="notif-compose-label">Soạn thông báo mới</div>
+
+                <!-- Recipient chips -->
+                <div style="font-size:11px;color:var(--text-secondary);margin-bottom:5px">Gửi tới</div>
+                <div class="notif-chip-row" id="notif-chips">
+                    <span class="notif-chip active" data-val="school">Toàn trường</span>
+                    <span class="notif-chip" data-val="grade12">Khối 12</span>
+                    <span class="notif-chip" data-val="class">Theo lớp</span>
+                    <span class="notif-chip" data-val="personal">Cá nhân</span>
+                </div>
+
+                <form method="post" asp-action="ComposeNotification" id="notif-form">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="recipients" id="notif-recipients-hidden" value="school" />
+                    <input class="notif-inp" name="title" placeholder="Tiêu đề thông báo..." required />
+                    <textarea class="notif-inp" name="body" rows="3" placeholder="Nội dung thông báo..." required></textarea>
+                    <select class="notif-inp" name="category">
+                        <option>Kỳ thi</option>
+                        <option>Kết quả</option>
+                        <option>Hệ thống</option>
+                        <option>Cảnh báo</option>
+                    </select>
+                    <div class="notif-compose-foot">
+                        <button class="btn ghost" type="button" id="notif-cancel-btn">Hủy</button>
+                        <button class="btn ghost" type="button" style="color:var(--primary)">
+                            <i class="fa-solid fa-clock"></i> Hẹn giờ gửi
+                        </button>
+                        <button class="btn primary" type="submit">
+                            <i class="fa-solid fa-paper-plane"></i> Gửi ngay
+                        </button>
+                    </div>
+                </form>
+            </div>
+        }
+
+        <!-- Notification list -->
+        <div class="notif-list">
+            @if (!Model.Items.Any())
+            {
+                <div class="notif-empty">
+                    <i class="fa-regular fa-bell-slash"></i>
+                    <p>Không có thông báo nào.</p>
+                </div>
+            }
+            @foreach (var item in Model.Items)
+            {
+                var (bg, iconCls, iconColor) = ToneInfo(item.Tone);
+                var isUrgent = item.Tone == "danger";
+                <article class="notif-item @(item.Unread ? "unread" : "") @(isUrgent ? "notif-urgent" : "")">
+                    <div class="notif-item-icon" style="background:@bg">
+                        <i class="fa-solid @iconCls" style="color:@iconColor"></i>
+                    </div>
+                    <div class="notif-item-body">
+                        <div class="notif-item-title">@item.Title</div>
+                        <div class="notif-item-desc">@item.Body</div>
+                        <div class="notif-item-foot">
+                            <span class="notif-tag" style="background:@bg;color:@iconColor">@item.Category</span>
+                            <span class="notif-time">@item.Time</span>
+                        </div>
+                        <div class="notif-actions">
+                            @if (item.Tone == "danger")
+                            {
+                                <a class="notif-action-btn primary" asp-controller="School" asp-action="Reports">Xem báo cáo</a>
+                            }
+                            else if (item.Category == "Kết quả")
+                            {
+                                <a class="notif-action-btn primary" asp-controller="School" asp-action="Reports">Xem thống kê</a>
+                            }
+                            else if (item.Category == "Kỳ thi")
+                            {
+                                <a class="notif-action-btn primary" asp-controller="School" asp-action="Calendar">Xem lịch thi</a>
+                            }
+                            <form method="post" asp-action="MarkNotificationsRead" style="display:inline">
+                                @Html.AntiForgeryToken()
+                                <button class="notif-action-btn" type="submit">Đánh dấu đã đọc</button>
+                            </form>
+                        </div>
+                    </div>
+                    @if (item.Unread)
+                    {
+                        <span class="notif-unread-dot"></span>
+                    }
+                </article>
+            }
+        </div>
+    </section>
+</div>
+
+@section Scripts {
+<script>
+(function() {
+    // Compose box toggle
+    var composeBox = document.getElementById('notif-compose-box');
+    var triggerBtn = document.getElementById('notif-compose-toggle');
+    var cancelBtn  = document.getElementById('notif-cancel-btn');
+    if (composeBox) composeBox.style.display = 'none';
+    if (triggerBtn) {
+        triggerBtn.addEventListener('click', function() {
+            composeBox.style.display = composeBox.style.display === 'none' ? 'block' : 'none';
+        });
+    }
+    if (cancelBtn) {
+        cancelBtn.addEventListener('click', function() {
+            if (composeBox) composeBox.style.display = 'none';
+        });
+    }
+
+    // Recipient chips
+    var chips = document.querySelectorAll('.notif-chip');
+    var hidden = document.getElementById('notif-recipients-hidden');
+    chips.forEach(function(chip) {
+        chip.addEventListener('click', function() {
+            chip.classList.toggle('active');
+            var selected = Array.from(chips)
+                .filter(function(c) { return c.classList.contains('active'); })
+                .map(function(c) { return c.dataset.val; }).join(',');
+            if (hidden) hidden.value = selected || 'school';
+        });
+    });
+})();
+</script>
+}

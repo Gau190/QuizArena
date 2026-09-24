@@ -1,0 +1,222 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:var(--font-sans)}
+.w{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden}
+.nav{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-bottom:0.5px solid var(--color-border-tertiary)}
+.logo{font-size:15px;font-weight:500;color:var(--color-text-primary)}
+.logo span{color:#2563EB}
+.body{display:grid;grid-template-columns:1fr 280px;gap:0}
+.main{padding:22px 24px;border-right:0.5px solid var(--color-border-tertiary)}
+.side{padding:22px 20px}
+.steps{display:flex;align-items:center;gap:0;margin-bottom:22px}
+.step{display:flex;align-items:center;gap:8px}
+.step-num{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;flex-shrink:0}
+.step-label{font-size:12px;font-weight:500}
+.step-line{flex:1;height:0.5px;background:var(--color-border-tertiary);margin:0 8px}
+.sec{font-size:11px;font-weight:500;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px;margin-top:18px}
+.sec:first-child{margin-top:0}
+.field{margin-bottom:12px}
+.field label{display:block;font-size:12px;color:var(--color-text-secondary);margin-bottom:5px}
+.inp{width:100%;padding:8px 10px;font-size:13px;font-family:var(--font-sans);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);background:var(--color-background-primary);color:var(--color-text-primary);outline:none}
+.inp:focus{border-color:#3B82F6;box-shadow:0 0 0 2px #EFF6FF}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.mode-cards{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.mc{border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:12px;cursor:pointer}
+.mc.active{border-color:#3B82F6;background:#EFF6FF}
+.mc-title{font-size:13px;font-weight:500;margin-bottom:3px}
+.mc.active .mc-title{color:#1E3A8A}
+.mc-desc{font-size:11px;color:var(--color-text-secondary)}
+.mc.active .mc-desc{color:#2563EB}
+.diff-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:0.5px solid var(--color-border-tertiary)}
+.diff-row:last-child{border-bottom:none}
+.diff-label{font-size:13px;color:var(--color-text-primary);flex:1}
+.diff-count{display:flex;align-items:center;gap:6px}
+.counter-btn{width:22px;height:22px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:var(--color-background-primary);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--color-text-primary);font-family:var(--font-sans)}
+.counter-val{width:28px;text-align:center;font-size:13px;font-weight:500;color:var(--color-text-primary)}
+.diff-avail{font-size:11px;color:var(--color-text-secondary);min-width:60px}
+.preview-card{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:14px;margin-bottom:14px}
+.pc-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;font-size:13px}
+.pc-row:last-child{margin-bottom:0}
+.pc-label{color:var(--color-text-secondary)}
+.pc-val{font-weight:500;color:var(--color-text-primary)}
+.warn-box{background:#FFEDD5;border:0.5px solid #FDBA74;border-radius:var(--border-radius-md);padding:10px 12px;font-size:12px;color:#633806;display:flex;gap:7px;align-items:flex-start;margin-bottom:14px}
+.foot{display:flex;align-items:center;justify-content:space-between;padding:16px 24px;border-top:0.5px solid var(--color-border-tertiary)}
+.btn{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:500;padding:8px 16px;border-radius:var(--border-radius-md);cursor:pointer;font-family:var(--font-sans)}
+.btn-outline{background:var(--color-background-primary);border:0.5px solid var(--color-border-secondary);color:var(--color-text-primary)}
+.btn-primary{background:#2563EB;color:#EFF6FF;border:none}
+.btn-ghost{background:transparent;border:none;color:var(--color-text-secondary)}
+</style>
+<h2 class="sr-only">Form tạo kỳ thi mới dành cho Giáo viên — cấu hình đề ngẫu nhiên theo số lượng hoặc tổng điểm</h2>
+<div class="w">
+  <div class="nav">
+    <div style="display:flex;align-items:center;gap:8px">
+      <span class="logo"><span>Exam</span>Hub</span>
+      <span style="color:var(--color-border-secondary)">/</span>
+      <span style="font-size:13px;color:var(--color-text-secondary)">Tạo kỳ thi mới</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <span style="font-size:12px;padding:3px 10px;background:#DCFCE7;color:#166534;border-radius:20px;font-weight:500">Giáo viên</span>
+      <div style="width:28px;height:28px;border-radius:50%;background:#DCFCE7;color:#166534;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500">GV</div>
+    </div>
+  </div>
+
+  <div style="padding:16px 24px;border-bottom:0.5px solid var(--color-border-tertiary)">
+    <div class="steps">
+      <div class="step">
+        <div class="step-num" style="background:#2563EB;color:#EFF6FF">1</div>
+        <span class="step-label" style="color:#2563EB">Thông tin chung</span>
+      </div>
+      <div class="step-line"></div>
+      <div class="step">
+        <div class="step-num" style="background:#2563EB;color:#EFF6FF">2</div>
+        <span class="step-label" style="color:#2563EB">Cấu hình đề thi</span>
+      </div>
+      <div class="step-line"></div>
+      <div class="step">
+        <div class="step-num" style="background:var(--color-background-secondary);color:var(--color-text-secondary);border:0.5px solid var(--color-border-tertiary)">3</div>
+        <span class="step-label" style="color:var(--color-text-secondary)">Phân công & Xem lại</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="body">
+    <div class="main">
+      <div class="sec" style="margin-top:0">Thông tin kỳ thi</div>
+      <div class="field">
+        <label>Tên kỳ thi</label>
+        <input class="inp" type="text" value="Kiểm tra Toán giữa kỳ II — Lớp 12A">
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label>Môn học</label>
+          <select class="inp"><option>Toán học</option><option>Vật lý</option><option>Hóa học</option></select>
+        </div>
+        <div class="field">
+          <label>Lớp áp dụng</label>
+          <select class="inp"><option>12A1</option><option>Nhiều lớp...</option><option>Toàn khối 12</option></select>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label>Thời gian bắt đầu</label>
+          <input class="inp" type="datetime-local" value="2025-03-28T08:00">
+        </div>
+        <div class="field">
+          <label>Thời gian kết thúc</label>
+          <input class="inp" type="datetime-local" value="2025-03-28T09:30">
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label>Thời lượng làm bài (phút)</label>
+          <input class="inp" type="number" value="45">
+        </div>
+        <div class="field">
+          <label>Số lần thi tối đa</label>
+          <input class="inp" type="number" value="1">
+        </div>
+      </div>
+
+      <div class="sec">Chế độ sinh đề ngẫu nhiên</div>
+      <div class="mode-cards">
+        <div class="mc active">
+          <div class="mc-title">Theo số lượng câu</div>
+          <div class="mc-desc">Bốc ngẫu nhiên đúng số câu đã chỉ định từ ngân hàng</div>
+        </div>
+        <div class="mc">
+          <div class="mc-title">Theo tổng điểm</div>
+          <div class="mc-desc">Bốc câu hỏi cho đến khi tổng điểm đạt mức cài đặt</div>
+        </div>
+      </div>
+
+      <div class="sec">Cấu hình số câu theo độ khó</div>
+      <div>
+        <div class="diff-row">
+          <div style="display:flex;align-items:center;gap:7px;flex:1">
+            <span style="font-size:11px;padding:2px 8px;border-radius:20px;background:#DCFCE7;color:#166534;font-weight:500">Dễ</span>
+            <span class="diff-label">Câu dễ</span>
+          </div>
+          <div class="diff-count">
+            <button class="counter-btn">−</button>
+            <span class="counter-val">12</span>
+            <button class="counter-btn">+</button>
+          </div>
+          <span class="diff-avail">/ 54 câu có sẵn</span>
+        </div>
+        <div class="diff-row">
+          <div style="display:flex;align-items:center;gap:7px;flex:1">
+            <span style="font-size:11px;padding:2px 8px;border-radius:20px;background:#FFEDD5;color:#633806;font-weight:500">Trung bình</span>
+            <span class="diff-label">Câu trung bình</span>
+          </div>
+          <div class="diff-count">
+            <button class="counter-btn">−</button>
+            <span class="counter-val">20</span>
+            <button class="counter-btn">+</button>
+          </div>
+          <span class="diff-avail">/ 38 câu có sẵn</span>
+        </div>
+        <div class="diff-row">
+          <div style="display:flex;align-items:center;gap:7px;flex:1">
+            <span style="font-size:11px;padding:2px 8px;border-radius:20px;background:#FEE2E2;color:#991B1B;font-weight:500">Khó</span>
+            <span class="diff-label">Câu khó</span>
+          </div>
+          <div class="diff-count">
+            <button class="counter-btn">−</button>
+            <span class="counter-val">8</span>
+            <button class="counter-btn">+</button>
+          </div>
+          <span class="diff-avail">/ 22 câu có sẵn</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="side">
+      <div class="sec" style="margin-top:0">Xem trước kỳ thi</div>
+      <div class="preview-card">
+        <div class="pc-row"><span class="pc-label">Tổng số câu</span><span class="pc-val" style="color:#2563EB">40 câu</span></div>
+        <div class="pc-row"><span class="pc-label">Thời lượng</span><span class="pc-val">45 phút</span></div>
+        <div class="pc-row"><span class="pc-label">Dễ / TB / Khó</span><span class="pc-val">12 / 20 / 8</span></div>
+        <div class="pc-row"><span class="pc-label">Điểm mỗi câu</span><span class="pc-val">0.25 điểm</span></div>
+        <div class="pc-row"><span class="pc-label">Tổng điểm</span><span class="pc-val">10.0</span></div>
+        <div class="pc-row"><span class="pc-label">Ngày thi</span><span class="pc-val">28/03/2025</span></div>
+      </div>
+
+      <div class="warn-box">
+        <i class="ti ti-alert-circle" style="font-size:15px;flex-shrink:0;margin-top:1px" aria-hidden="true"></i>
+        <span>Ngân hàng câu hỏi chỉ có 22 câu khó. Nếu cần hơn, hãy thêm câu hỏi trước khi lưu.</span>
+      </div>
+
+      <div class="sec">Tùy chọn bảo mật</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer">
+          <input type="checkbox" checked style="width:14px;height:14px">
+          <span style="color:var(--color-text-primary)">Trộn thứ tự câu hỏi</span>
+        </label>
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer">
+          <input type="checkbox" checked style="width:14px;height:14px">
+          <span style="color:var(--color-text-primary)">Trộn thứ tự đáp án</span>
+        </label>
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer">
+          <input type="checkbox" checked style="width:14px;height:14px">
+          <span style="color:var(--color-text-primary)">Bật anti-cheat (phát hiện chuyển tab)</span>
+        </label>
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer">
+          <input type="checkbox" style="width:14px;height:14px">
+          <span style="color:var(--color-text-primary)">Hiện đáp án sau khi nộp bài</span>
+        </label>
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer">
+          <input type="checkbox" checked style="width:14px;height:14px">
+          <span style="color:var(--color-text-primary)">Tự động nộp khi hết giờ</span>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <div class="foot">
+    <button class="btn btn-ghost"><i class="ti ti-arrow-left" style="font-size:14px" aria-hidden="true"></i>Quay lại</button>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-outline"><i class="ti ti-device-floppy" style="font-size:14px" aria-hidden="true"></i>Lưu nháp</button>
+      <button class="btn btn-primary">Tiếp theo <i class="ti ti-arrow-right" style="font-size:14px" aria-hidden="true"></i></button>
+    </div>
+  </div>
+</div>

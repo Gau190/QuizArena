@@ -1,0 +1,47 @@
+@{
+    ViewData["Title"] = "Trang chủ";
+}
+
+<div class="landing">
+    <div class="land-nav">
+        <a class="brand-row" asp-action="Index"><span class="brand-icon">Q</span><span class="brand-name">QuizArena</span></a>
+        <a class="btn" asp-controller="Account" asp-action="Login">Đăng nhập</a>
+    </div>
+
+    <header class="land-hero">
+        <h1>Thi trắc nghiệm trực tuyến cho các môn học trong trường.</h1>
+        <p class="lead">Giảng viên xây dựng ngân hàng câu hỏi, hệ thống tự sinh đề ngẫu nhiên cho từng thí sinh, chấm điểm ngay khi nộp bài.</p>
+        <div class="land-cta">
+            <a class="btn primary" asp-controller="Account" asp-action="Login">Vào thi</a>
+            <a class="btn" href="#tinh-nang">Tính năng</a>
+        </div>
+    </header>
+
+    <section class="land-section" id="tinh-nang">
+        <h2>Tính năng</h2>
+        <p class="sub">Các nghiệp vụ chính theo đề bài.</p>
+        <div class="feature-cards">
+            <article class="feature-card"><i class="fa-solid fa-database"></i><h3>Ngân hàng câu hỏi</h3><p>Thêm, sửa, nhập từ CSV/XLSX. Phân loại theo môn, độ khó và dạng câu hỏi.</p></article>
+            <article class="feature-card"><i class="fa-solid fa-shuffle"></i><h3>Sinh đề ngẫu nhiên</h3><p>Theo số câu, tổng điểm hoặc số câu Dễ/Trung bình/Khó của kỳ thi.</p></article>
+            <article class="feature-card"><i class="fa-solid fa-stopwatch"></i><h3>Làm bài có giờ</h3><p>Đồng hồ tính theo máy chủ, đáp án tự lưu, tự nộp khi hết giờ.</p></article>
+            <article class="feature-card"><i class="fa-solid fa-pen"></i><h3>Câu trả lời tự nhập</h3><p>Thí sinh gõ đáp án, hệ thống chuẩn hoá chuỗi rồi so với đáp án đúng.</p></article>
+            <article class="feature-card"><i class="fa-solid fa-chart-column"></i><h3>Thống kê</h3><p>Điểm trung bình, tỷ lệ đạt, câu hỏi khó; xuất Excel.</p></article>
+            <article class="feature-card"><i class="fa-solid fa-lock"></i><h3>Phân quyền</h3><p>Ba vai trò, mỗi tài khoản một phiên đăng nhập.</p></article>
+        </div>
+    </section>
+
+    <section class="land-section">
+        <h2>Ba vai trò</h2>
+        <p class="sub">Mỗi người dùng chỉ thấy chức năng của vai trò mình.</p>
+        <div class="role-cards">
+            <article class="role-card"><h3>Quản trị viên</h3><ul><li>Người dùng, lớp học, môn thi</li><li>Năm học, phòng thi</li><li>Báo cáo, cài đặt</li></ul></article>
+            <article class="role-card"><h3>Giảng viên</h3><ul><li>Soạn câu hỏi, cấu trúc đề</li><li>Tạo kỳ thi</li><li>Xem kết quả, xuất bảng điểm</li></ul></article>
+            <article class="role-card"><h3>Thí sinh</h3><ul><li>Làm bài và nộp bài</li><li>Xem kết quả, đáp án</li><li>Học bạ, lịch thi</li></ul></article>
+        </div>
+    </section>
+
+    <footer class="land-foot">
+        <span>QuizArena · Bài tập lớn Lập trình Web, Đề 3</span>
+        <span>Nhóm 13 · Trường Đại học Mở Hà Nội</span>
+    </footer>
+</div>

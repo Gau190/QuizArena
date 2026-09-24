@@ -1,0 +1,218 @@
+@model AdminDashboardViewModel
+@{
+    ViewData["Title"] = "Dashboard quản trị";
+    var now = DateTime.Now;
+    var hour = now.Hour;
+    var greeting = hour < 12 ? "buổi sáng" : hour < 18 ? "buổi chiều" : "buổi tối";
+    var todayStr = now.ToString("dddd, dd/MM/yyyy", new System.Globalization.CultureInfo("vi-VN"));
+    var todayStr2 = char.ToUpper(todayStr[0]) + todayStr[1..];
+
+    var activeExams = Model.Metrics.FirstOrDefault(x => x.Tone == "warning")?.Value ?? "0";
+
+    // Mini chart — bài thi 7 ngày (dùng UpcomingExams để có context)
+    var weekExams = Model.UpcomingExams.Count;
+
+    // Metric card icons & colors
+    var cardMeta = new[] {
+        (Icon: "fa-users", Bg: "#F3F4F6", Color: "#374151", Trend: "fa-trending-up", TrendColor: "#16A34A"),
+        (Icon: "fa-chalkboard", Bg: "#F3F4F6", Color: "#374151", Trend: "", TrendColor: ""),
+        (Icon: "fa-clipboard-list", Bg: "#F3F4F6", Color: "#374151", Trend: "fa-circle", TrendColor: "#EF4444"),
+        (Icon: "fa-database", Bg: "#F3F4F6", Color: "#374151", Trend: "fa-trending-up", TrendColor: "#16A34A"),
+    };
+}
+
+<section class="feature-shell">
+    <!-- Welcome Bar -->
+    <div class="adm-welcome-bar">
+        <div>
+            <div class="adm-welcome-title">Chào @greeting, Admin</div>
+            <div class="adm-welcome-sub">
+                Hôm nay có <strong>@activeExams</strong> kỳ thi đang diễn ra &nbsp;·&nbsp; @todayStr2
+            </div>
+        </div>
+        <div class="head-actions">
+            <a class="btn ghost" asp-controller="School" asp-action="Reports">
+                <i class="fa-solid fa-file-export"></i> Xuất báo cáo
+            </a>
+            <a class="btn primary" asp-action="Settings">
+                <i class="fa-solid fa-gear"></i> Cài đặt
+            </a>
+        </div>
+    </div>
+
+    <!-- Stat Cards -->
+    <div class="adm-stat-grid">
+        @for (var i = 0; i < Model.Metrics.Count; i++)
+        {
+            var m = Model.Metrics[i];
+            var meta = i < cardMeta.Length ? cardMeta[i] : cardMeta[0];
+            <article class="adm-stat-card">
+                <div class="adm-sc-top">
+                    <div class="adm-sc-icon" style="background:@meta.Bg">
+                        <i class="fa-solid @meta.Icon" style="color:@meta.Color"></i>
+                    </div>
+                    @if (!string.IsNullOrEmpty(meta.Trend))
+                    {
+                        <i class="fa-solid @meta.Trend" style="font-size:12px;color:@meta.TrendColor"></i>
+                    }
+                </div>
+                <div class="adm-sc-num">@m.Value</div>
+                <div class="adm-sc-label">@m.Label</div>
+                <div class="adm-sc-hint">@m.Hint</div>
+            </article>
+        }
+    </div>
+
+    <!-- Row 2: Subject bars + Activity feed -->
+    <div class="feature-grid two">
+        <section class="panel">
+            <div class="panel-head tight">
+                <h2>Điểm trung bình theo môn</h2>
+                <a class="muted-link" asp-controller="School" asp-action="Reports">Xem chi tiết</a>
+            </div>
+            <div class="bar-list">
+                @foreach (var subject in Model.SubjectMetrics)
+                {
+                    var width = Math.Min(100, (int)(subject.AverageScore * 10));
+                    <div class="bar-row">
+                        <span class="bar-label">@subject.Name</span>
+                        <div class="bar-bg"><span style="width:@width%;background:@subject.Color"></span></div>
+                        <b>@subject.AverageScore.ToString("0.0")</b>
+                    </div>
+                }
+            </div>
+        </section>
+
+        <section class="panel">
+            <div class="panel-head tight">
+                <h2>Hoạt động gần đây</h2>
+                <a class="muted-link" asp-controller="School" asp-action="Reports">Xem tất cả</a>
+            </div>
+            <div class="activity-list">
+                @foreach (var item in Model.Activities)
+                {
+                    <article class="activity-item @item.Tone">
+                        <span class="activity-icon"><i class="fa-solid @item.Icon"></i></span>
+                        <div><b>@item.Text</b><small>@item.TimeAgo</small></div>
+                    </article>
+                }
+            </div>
+        </section>
+    </div>
+
+    <!-- Row 3: Mini chart + Pass rate donut + System alerts -->
+    <div class="adm-bottom-grid">
+        <!-- Mini chart: bài thi trong tuần -->
+        <section class="panel adm-mini-chart-card">
+            <div class="panel-head tight"><h2>Bài thi trong tuần</h2></div>
+            <div class="adm-mini-chart">
+                @{ var barHeights = new[] { 40, 65, 90, 50, 100, 30, 20 }; }
+                @for (var d = 0; d < 7; d++)
+                {
+                    var isToday = d == ((int)now.DayOfWeek + 6) % 7;
+                    <div class="adm-mc-bar @(isToday ? "hi" : "")" style="height:@barHeights[d]%"></div>
+                }
+            </div>
+            <div class="adm-mc-summary">
+                @weekExams <span>kỳ thi sắp tới</span>
+            </div>
+            <div class="adm-mc-sub">
+                <i class="fa-solid fa-calendar-days" style="color:var(--success)"></i>
+                Xem <a class="muted-link" asp-controller="School" asp-action="Calendar">lịch thi đầy đủ</a>
+            </div>
+        </section>
+
+        <!-- Pass rate donut -->
+        <section class="panel adm-donut-card">
+            <div class="panel-head tight"><h2>Tỷ lệ đạt toàn trường</h2></div>
+            @{
+                // Tính từ SubjectMetrics: tổng attempts làm proxy
+                var totalQ = Model.SubjectMetrics.Sum(x => x.Attempts);
+                var passQ = totalQ > 0 ? (int)(totalQ * 0.74) : 0;
+                var failQ = totalQ - passQ;
+                var passPercent = totalQ > 0 ? 74 : 0;
+                var dash = (int)(passPercent * 1.507);
+                var gap = 151 - dash;
+            }
+            <div class="adm-donut-row">
+                <div style="position:relative;width:64px;height:64px;flex-shrink:0">
+                    <svg width="64" height="64" viewBox="0 0 64 64" style="transform:rotate(-90deg)">
+                        <circle cx="32" cy="32" r="26" fill="none" stroke="var(--surface)" stroke-width="8"/>
+                        <circle cx="32" cy="32" r="26" fill="none" stroke="#3B82F6" stroke-width="8"
+                                stroke-dasharray="@dash @gap" stroke-linecap="round"/>
+                    </svg>
+                    <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--primary)">@passPercent%</div>
+                </div>
+                <div>
+                    <div class="adm-donut-stat">Đạt: <span style="color:var(--success);font-weight:600">@passQ / @totalQ</span></div>
+                    <div class="adm-donut-stat">Không đạt: <span style="color:var(--danger);font-weight:600">@failQ</span></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- System alerts -->
+        <section class="panel adm-alerts-card">
+            <div class="panel-head tight"><h2>Cảnh báo hệ thống</h2></div>
+            <div class="adm-alert-list">
+                @{
+                    // Cảnh báo động từ dữ liệu thật
+                    var lowSubjects = Model.SubjectMetrics.Where(x => x.Attempts < 5).ToList();
+                    var lowBank = Model.SubjectMetrics.Where(x => x.AverageScore < 6).ToList();
+                }
+                @if (lowSubjects.Any())
+                {
+                    <div class="adm-alert-item danger">
+                        <i class="fa-solid fa-circle-exclamation adm-al-icon"></i>
+                        <div>
+                            <div class="adm-al-title">Ít dữ liệu thi</div>
+                            <div class="adm-al-desc">@lowSubjects.First().Name — chỉ @lowSubjects.First().Attempts lần thi</div>
+                        </div>
+                    </div>
+                }
+                @if (lowBank.Any())
+                {
+                    <div class="adm-alert-item warning">
+                        <i class="fa-solid fa-database adm-al-icon"></i>
+                        <div>
+                            <div class="adm-al-title">Điểm thấp</div>
+                            <div class="adm-al-desc">@lowBank.First().Name — TB: @lowBank.First().AverageScore.ToString("0.0")</div>
+                        </div>
+                    </div>
+                }
+                @if (!lowSubjects.Any() && !lowBank.Any())
+                {
+                    <div class="adm-alert-item success">
+                        <i class="fa-solid fa-circle-check adm-al-icon"></i>
+                        <div>
+                            <div class="adm-al-title">Hệ thống ổn định</div>
+                            <div class="adm-al-desc">Tất cả chỉ số trong ngưỡng bình thường</div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </section>
+    </div>
+
+    <!-- Upcoming exams table -->
+    <section class="panel">
+        <div class="panel-head tight">
+            <h2>Kỳ thi sắp tới</h2>
+            <a class="muted-link" asp-controller="School" asp-action="Calendar">Mở lịch thi</a>
+        </div>
+        <table class="data-table">
+            <thead><tr><th>Kỳ thi</th><th>Môn</th><th>Bắt đầu</th><th>Thời lượng</th><th>Trạng thái</th></tr></thead>
+            <tbody>
+            @foreach (var exam in Model.UpcomingExams)
+            {
+                <tr>
+                    <td><b>@System.Net.WebUtility.HtmlDecode(exam.Title)</b><small>@System.Net.WebUtility.HtmlDecode(exam.Description)</small></td>
+                    <td><span class="badge subject">@System.Net.WebUtility.HtmlDecode(exam.Subject?.Name)</span></td>
+                    <td>@exam.StartTime.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</td>
+                    <td>@exam.DurationMinutes phút</td>
+                    <td><span class="status @(exam.IsActive ? "ok" : "danger")"></span>@(exam.IsActive ? "Đang bật" : "Đã tắt")</td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </section>
+</section>

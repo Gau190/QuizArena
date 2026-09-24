@@ -1,0 +1,15 @@
+@model ErrorViewModel
+@{
+    ViewData["Title"] = "Đã xảy ra lỗi";
+}
+
+<section class="panel compact" style="text-align:center;margin-top:48px">
+    <div style="font-size:44px;color:var(--danger)"><i class="fa-solid fa-triangle-exclamation"></i></div>
+    <h1 style="margin:10px 0 6px">Rất tiếc, đã có lỗi xảy ra</h1>
+    <p class="muted" style="font-size:14px">Yêu cầu của bạn chưa được xử lý. Vui lòng thử lại hoặc liên hệ quản trị viên.</p>
+    @if (Model.ShowRequestId)
+    {
+        <p class="muted">Mã yêu cầu: <code>@Model.RequestId</code></p>
+    }
+    <p><a class="btn primary" asp-controller="Home" asp-action="Index">Về trang chủ</a></p>
+</section>

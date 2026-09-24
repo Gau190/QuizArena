@@ -1,0 +1,189 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:var(--font-sans)}
+.w{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden}
+.nav{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-bottom:0.5px solid var(--color-border-tertiary)}
+.nav-logo{font-size:15px;font-weight:500;color:var(--color-text-primary)}
+.nav-logo span{color:#2563EB}
+.nav-bc{font-size:13px;color:var(--color-text-secondary)}
+.nav-r{display:flex;align-items:center;gap:10px}
+.av-sm{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500}
+.body{display:grid;grid-template-columns:200px 1fr}
+.sidebar{border-right:0.5px solid var(--color-border-tertiary);padding:20px 16px}
+.av-lg{width:60px;height:60px;border-radius:50%;background:#EFF6FF;color:#1E3A8A;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:500;margin:0 auto 12px}
+.s-name{font-size:14px;font-weight:500;color:var(--color-text-primary);text-align:center;margin-bottom:3px}
+.s-sub{font-size:11px;color:var(--color-text-secondary);text-align:center;margin-bottom:10px}
+.badges{display:flex;flex-direction:column;gap:4px;margin-bottom:16px}
+.badge{font-size:11px;padding:3px 8px;border-radius:20px;font-weight:500;text-align:center}
+.info-row{display:flex;align-items:flex-start;gap:7px;padding:6px 0;border-bottom:0.5px solid var(--color-border-tertiary);font-size:12px}
+.info-row:last-child{border-bottom:none}
+.info-icon{color:var(--color-text-secondary);font-size:13px;margin-top:1px;flex-shrink:0}
+.info-val{color:var(--color-text-primary);line-height:1.4}
+.info-lbl{color:var(--color-text-secondary);font-size:11px}
+.main{padding:20px}
+.tab-row{display:flex;gap:0;border-bottom:0.5px solid var(--color-border-tertiary);margin-bottom:16px}
+.tab{font-size:12px;padding:7px 14px;cursor:pointer;color:var(--color-text-secondary);border-bottom:2px solid transparent;margin-bottom:-0.5px}
+.tab.active{color:#2563EB;border-bottom-color:#2563EB;font-weight:500}
+.sec{font-size:11px;font-weight:500;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px}
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:18px}
+.stat-c{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:10px 8px;text-align:center}
+.stat-n{font-size:18px;font-weight:500}
+.stat-l{font-size:11px;color:var(--color-text-secondary);margin-top:2px}
+.chart-area{display:flex;align-items:flex-end;gap:5px;height:90px;margin-bottom:5px;border-bottom:0.5px solid var(--color-border-tertiary)}
+.bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px}
+.bar-v{font-size:10px;color:var(--color-text-secondary)}
+.bar-b{width:100%;border-radius:3px 3px 0 0}
+.x-row{display:flex;gap:5px;margin-bottom:16px}
+.x-lbl{flex:1;font-size:10px;color:var(--color-text-secondary);text-align:center}
+.subj-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:0.5px solid var(--color-border-tertiary)}
+.subj-row:last-child{border-bottom:none}
+.subj-info{flex:1}
+.subj-name{font-size:13px;color:var(--color-text-primary);font-weight:500}
+.subj-meta{font-size:11px;color:var(--color-text-secondary);margin-top:1px}
+.pb{height:4px;width:68px;background:var(--color-background-secondary);border-radius:2px;overflow:hidden}
+.pb-f{height:100%;border-radius:2px}
+.score{font-size:13px;font-weight:500;min-width:30px;text-align:right}
+.compare{margin-top:16px}
+.cmp-row{margin-bottom:10px}
+.cmp-head{display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px}
+.cmp-bar{height:5px;background:var(--color-background-secondary);border-radius:3px;overflow:hidden}
+.cmp-fill{height:100%;border-radius:3px}
+</style>
+<h2 class="sr-only">Hồ sơ học sinh Nguyễn Thị Thanh — biểu đồ tiến bộ và điểm theo môn</h2>
+<div class="w">
+  <div class="nav">
+    <div style="display:flex;align-items:center;gap:8px">
+      <span class="nav-logo"><span>Exam</span>Hub</span>
+      <span style="color:var(--color-border-secondary);font-size:13px">/</span>
+      <span class="nav-bc">Hồ sơ học sinh</span>
+    </div>
+    <div class="nav-r">
+      <span style="font-size:12px;padding:3px 10px;background:#DCFCE7;color:#166534;border-radius:20px;font-weight:500">Giáo viên</span>
+      <div class="av-sm" style="background:#EFF6FF;color:#1E3A8A">GV</div>
+    </div>
+  </div>
+
+  <div class="body">
+    <div class="sidebar">
+      <div class="av-lg">NT</div>
+      <div class="s-name">Nguyễn Thị Thanh</div>
+      <div class="s-sub">Lớp 12A1 · HS-0089</div>
+      <div class="badges">
+        <span class="badge" style="background:#DCFCE7;color:#166534">Học lực: Giỏi</span>
+        <span class="badge" style="background:#EFF6FF;color:#1E3A8A">Hạnh kiểm: Tốt</span>
+      </div>
+      <div>
+        <div class="info-row">
+          <i class="ti ti-calendar info-icon" aria-hidden="true"></i>
+          <div><div class="info-lbl">Ngày sinh</div><div class="info-val">15/03/2007</div></div>
+        </div>
+        <div class="info-row">
+          <i class="ti ti-id-badge info-icon" aria-hidden="true"></i>
+          <div><div class="info-lbl">Mã HS</div><div class="info-val">HS-2024-0089</div></div>
+        </div>
+        <div class="info-row">
+          <i class="ti ti-building-school info-icon" aria-hidden="true"></i>
+          <div><div class="info-lbl">Trường</div><div class="info-val">THPT Chu Văn An</div></div>
+        </div>
+        <div class="info-row">
+          <i class="ti ti-mail info-icon" aria-hidden="true"></i>
+          <div><div class="info-lbl">Email</div><div class="info-val" style="color:#2563EB">thanh.nt@school.vn</div></div>
+        </div>
+        <div class="info-row">
+          <i class="ti ti-phone info-icon" aria-hidden="true"></i>
+          <div><div class="info-lbl">SĐT</div><div class="info-val">0912 345 678</div></div>
+        </div>
+        <div class="info-row">
+          <i class="ti ti-user info-icon" aria-hidden="true"></i>
+          <div><div class="info-lbl">Phụ huynh</div><div class="info-val">Nguyễn Văn Hùng</div></div>
+        </div>
+      </div>
+      <div style="margin-top:14px">
+        <button style="width:100%;padding:7px;font-size:12px;font-weight:500;background:#2563EB;color:#EFF6FF;border:none;border-radius:var(--border-radius-md);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;font-family:var(--font-sans)"><i class="ti ti-file-text" style="font-size:13px" aria-hidden="true"></i>Xuất học bạ PDF</button>
+      </div>
+    </div>
+
+    <div class="main">
+      <div class="tab-row">
+        <div class="tab active">Tổng quan</div>
+        <div class="tab">Lịch sử thi</div>
+        <div class="tab">Cài đặt</div>
+      </div>
+
+      <div class="stat-grid">
+        <div class="stat-c"><div class="stat-n" style="color:#2563EB">9.1</div><div class="stat-l">Điểm TB</div></div>
+        <div class="stat-c"><div class="stat-n">24</div><div class="stat-l">Bài đã thi</div></div>
+        <div class="stat-c"><div class="stat-n" style="color:#16A34A">94%</div><div class="stat-l">Tỷ lệ đạt</div></div>
+        <div class="stat-c"><div class="stat-n" style="color:#C2410C">#5</div><div class="stat-l">Xếp hạng lớp</div></div>
+      </div>
+
+      <div class="sec">Tiến độ điểm theo tháng</div>
+      <div class="chart-area">
+        <div class="bar-col"><div class="bar-v">7.9</div><div class="bar-b" style="height:66%;background:#BFDBFE"></div></div>
+        <div class="bar-col"><div class="bar-v">8.1</div><div class="bar-b" style="height:70%;background:#BFDBFE"></div></div>
+        <div class="bar-col"><div class="bar-v">8.4</div><div class="bar-b" style="height:76%;background:#3B82F6"></div></div>
+        <div class="bar-col"><div class="bar-v">8.2</div><div class="bar-b" style="height:73%;background:#3B82F6"></div></div>
+        <div class="bar-col"><div class="bar-v">9.0</div><div class="bar-b" style="height:87%;background:#2563EB"></div></div>
+        <div class="bar-col"><div class="bar-v">9.1</div><div class="bar-b" style="height:90%;background:#2563EB"></div></div>
+      </div>
+      <div class="x-row">
+        <div class="x-lbl">Th.1</div><div class="x-lbl">Th.2</div><div class="x-lbl">Th.3</div>
+        <div class="x-lbl">Th.4</div><div class="x-lbl">Th.5</div><div class="x-lbl">Th.6</div>
+      </div>
+
+      <div class="sec">Điểm theo môn học</div>
+      <div>
+        <div class="subj-row">
+          <div class="subj-info">
+            <div class="subj-name">Toán học</div>
+            <div class="subj-meta">6 lần thi · gần nhất: 02/06/2026</div>
+          </div>
+          <div class="pb"><div class="pb-f" style="width:92%;background:#3B82F6"></div></div>
+          <div class="score" style="color:#2563EB">9.2</div>
+        </div>
+        <div class="subj-row">
+          <div class="subj-info">
+            <div class="subj-name">Vật lý</div>
+            <div class="subj-meta">5 lần thi · gần nhất: 28/05/2026</div>
+          </div>
+          <div class="pb"><div class="pb-f" style="width:86%;background:#22C55E"></div></div>
+          <div class="score" style="color:#16A34A">8.6</div>
+        </div>
+        <div class="subj-row">
+          <div class="subj-info">
+            <div class="subj-name">Hóa học</div>
+            <div class="subj-meta">5 lần thi · gần nhất: 20/05/2026</div>
+          </div>
+          <div class="pb"><div class="pb-f" style="width:79%;background:#F97316"></div></div>
+          <div class="score" style="color:#C2410C">7.9</div>
+        </div>
+        <div class="subj-row">
+          <div class="subj-info">
+            <div class="subj-name">Tiếng Anh</div>
+            <div class="subj-meta">4 lần thi · gần nhất: 15/05/2026</div>
+          </div>
+          <div class="pb"><div class="pb-f" style="width:94%;background:#3B82F6"></div></div>
+          <div class="score" style="color:#2563EB">9.4</div>
+        </div>
+      </div>
+
+      <div class="compare">
+        <div class="sec">So sánh với lớp</div>
+        <div class="cmp-row">
+          <div class="cmp-head">
+            <span style="color:var(--color-text-secondary);font-size:12px">Học sinh này</span>
+            <span style="color:#2563EB;font-weight:500;font-size:12px">9.1</span>
+          </div>
+          <div class="cmp-bar"><div class="cmp-fill" style="width:91%;background:#3B82F6"></div></div>
+        </div>
+        <div class="cmp-row">
+          <div class="cmp-head">
+            <span style="color:var(--color-text-secondary);font-size:12px">Trung bình lớp</span>
+            <span style="color:var(--color-text-secondary);font-size:12px">7.6</span>
+          </div>
+          <div class="cmp-bar"><div class="cmp-fill" style="width:76%;background:var(--color-border-secondary)"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

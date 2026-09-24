@@ -1,0 +1,48 @@
+@model IReadOnlyList<Subject>
+@{
+    ViewData["Title"] = "Quản lý môn thi";
+}
+
+<section class="panel">
+    <div class="panel-head">
+        <h1>Quản lý môn thi</h1>
+    </div>
+    @if (TempData["AdminMessage"] is string message)
+    {
+        <div class="alert info">@message</div>
+    }
+    <form class="inline-form" method="post" asp-action="CreateSubject">
+        @Html.AntiForgeryToken()
+        <input name="name" placeholder="Tên môn thi" required />
+        <input name="description" placeholder="Mô tả" />
+        <button class="btn primary" type="submit">Thêm môn</button>
+    </form>
+    <table class="data-table">
+        <thead><tr><th>Môn thi</th><th>Mô tả</th><th>Người tạo</th><th>Trạng thái</th><th></th></tr></thead>
+        <tbody>
+        @foreach (var subject in Model)
+        {
+            <tr>
+                <td>
+                    <form id="subject-form-@subject.Id" method="post" asp-action="UpdateSubject" asp-route-id="@subject.Id">
+                        @Html.AntiForgeryToken()
+                    </form>
+                    <input name="name" form="subject-form-@subject.Id" value="@subject.Name" required />
+                </td>
+                <td><input name="description" form="subject-form-@subject.Id" value="@subject.Description" /></td>
+                <td>@subject.Creator?.FullName</td>
+                <td><span class="status @(subject.IsActive ? "ok" : "danger")"></span>@(subject.IsActive ? "Hoạt động" : "Tắt")</td>
+                <td>
+                    <div class="table-actions">
+                        <button class="icon-btn" form="subject-form-@subject.Id" type="submit">Lưu</button>
+                        <form method="post" asp-action="ToggleSubject" asp-route-id="@subject.Id">
+                            @Html.AntiForgeryToken()
+                            <button class="icon-btn" type="submit">@(subject.IsActive ? "Tắt" : "Bật")</button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</section>

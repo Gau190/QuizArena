@@ -1,0 +1,66 @@
+@model ExamBlueprintViewModel
+@using QuizArena.Core.Enums
+@{
+    ViewData["Title"] = "Đề thi có cấu trúc";
+}
+
+<section class="feature-shell">
+    <div class="feature-head">
+        <div>
+            <h1>Đề thi có cấu trúc</h1>
+            <p>Cấu hình tỷ lệ dễ/trung bình/khó, bốc thăm theo chương hoặc chủ đề.</p>
+        </div>
+        <a class="btn primary" asp-controller="Teacher" asp-action="CreateExam"><i class="fa-solid fa-clipboard-list"></i> Tạo kỳ thi</a>
+    </div>
+
+    @if (TempData["SchoolMessage"] is string message)
+    {
+        <div class="alert info">@message</div>
+    }
+
+    <section class="panel">
+        <form id="blueprint-form" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="subjectId" value="@Model.SelectedSubjectId" />
+        </form>
+        <form class="blueprint-top" method="get">
+            <label>Môn thi
+                <select name="subjectId" onchange="this.form.submit()">
+                    @foreach (var subject in Model.Subjects)
+                    {
+                        <option value="@subject.Id" selected="@(subject.Id == Model.SelectedSubjectId)">@System.Net.WebUtility.HtmlDecode(subject.Name)</option>
+                    }
+                </select>
+            </label>
+            <label>Kiểu phân bổ
+                <select name="generateMode" form="blueprint-form">
+                    <option value="@GenerateMode.ByCount" selected="@(Model.GenerateMode == GenerateMode.ByCount)">Theo số lượng câu</option>
+                    <option value="@GenerateMode.ByPoints" selected="@(Model.GenerateMode == GenerateMode.ByPoints)">Theo tổng điểm</option>
+                </select>
+            </label>
+            <label>Tổng điểm
+                <input name="targetTotalPoints" form="blueprint-form" type="number" min="0" step="0.25" value="@Model.TargetTotalPoints.ToString("0.#")" />
+            </label>
+        </form>
+        <table class="data-table">
+            <thead><tr><th>Chương / Chủ đề</th><th>Dễ</th><th>Trung bình</th><th>Khó</th><th>Điểm</th></tr></thead>
+            <tbody>
+            @foreach (var row in Model.Rows)
+            {
+                <tr>
+                    <td><input class="line-input" name="chapter" form="blueprint-form" value="@row.Chapter" /></td>
+                    <td><input class="tiny-input" name="easyCount" form="blueprint-form" type="number" min="0" value="@row.EasyCount" /></td>
+                    <td><input class="tiny-input" name="mediumCount" form="blueprint-form" type="number" min="0" value="@row.MediumCount" /></td>
+                    <td><input class="tiny-input" name="hardCount" form="blueprint-form" type="number" min="0" value="@row.HardCount" /></td>
+                    <td><input class="tiny-input" name="points" form="blueprint-form" type="number" min="0" step="0.25" value="@row.Points.ToString("0.#")" /></td>
+                </tr>
+            }
+            </tbody>
+        </table>
+        <div class="blueprint-summary">
+            <span>Tổng câu: <b>@Model.TotalQuestions</b></span>
+            <span>Tổng điểm: <b>@Model.TotalPoints.ToString("0.#")</b></span>
+            <button class="btn primary" form="blueprint-form" type="submit">Lưu cấu trúc</button>
+        </div>
+    </section>
+</section>

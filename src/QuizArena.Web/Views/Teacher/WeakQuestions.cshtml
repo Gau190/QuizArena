@@ -1,0 +1,41 @@
+@model IReadOnlyList<WeakQuestionRow>
+@{
+    ViewData["Title"] = "Câu hỏi yếu";
+}
+
+<section class="feature-shell">
+    <div class="feature-head">
+        <div>
+            <h1>Câu hỏi yếu</h1>
+            <p>Các câu có tỷ lệ đúng thấp hoặc cần rà soát lại đáp án, nội dung và mức độ khó.</p>
+        </div>
+        <a class="btn ghost" asp-action="Questions"><i class="fa-solid fa-arrow-left"></i> Ngân hàng câu hỏi</a>
+    </div>
+
+    <section class="panel">
+        <table class="data-table">
+            <thead><tr><th>Câu</th><th>Môn</th><th>Nội dung</th><th>Tổng trả lời</th><th>Đúng</th><th>Tỷ lệ đúng</th><th>Báo lỗi</th></tr></thead>
+            <tbody>
+            @foreach (var row in Model)
+            {
+                <tr>
+                    <td><b>Q@row.QuestionId</b></td>
+                    <td>@row.Subject</td>
+                    <td style="max-width:420px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">@row.Content</td>
+                    <td>@row.Total</td>
+                    <td class="green">@row.Correct</td>
+                    <td>
+                        <div class="scorebar"><span style="width:@row.CorrectRate%;background:@(row.CorrectRate >= 40 ? "#F97316" : "#EF4444")"></span></div>
+                        @row.CorrectRate%
+                    </td>
+                    <td>@row.ReportCount</td>
+                </tr>
+            }
+            @if (Model.Count == 0)
+            {
+                <tr><td colspan="7">Chưa có câu hỏi nào dưới ngưỡng cảnh báo.</td></tr>
+            }
+            </tbody>
+        </table>
+    </section>
+</section>

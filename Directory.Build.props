@@ -1,0 +1,11 @@
+<Project>
+  <PropertyGroup>
+    <DefaultItemExcludes>$(DefaultItemExcludes);bin/**;obj/**</DefaultItemExcludes>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(OS)' == 'Windows_NT' and '$(LOCALAPPDATA)' != ''">
+    <QuizArenaBuildRoot>$(LOCALAPPDATA)\QuizArenaBuild\</QuizArenaBuildRoot>
+    <BaseIntermediateOutputPath>$(QuizArenaBuildRoot)obj\$(MSBuildProjectName)\</BaseIntermediateOutputPath>
+    <BaseOutputPath>$(QuizArenaBuildRoot)bin\$(MSBuildProjectName)\</BaseOutputPath>
+  </PropertyGroup>
+</Project>

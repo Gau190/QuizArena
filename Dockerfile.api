@@ -1,16 +1,16 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-WORKDIR /src
-COPY *.sln .
-COPY ExamHub.Core/*.csproj ExamHub.Core/
-COPY ExamHub.Infrastructure/*.csproj ExamHub.Infrastructure/
-COPY ExamHub.Api/*.csproj ExamHub.Api/
-RUN dotnet restore ExamHub.Api/ExamHub.Api.csproj
-COPY . .
-RUN dotnet publish ExamHub.Api/ExamHub.Api.csproj -c Release -o /app/publish
+WORKDIR /repo
+COPY QuizArena.sln Directory.Build.props ./
+COPY src/QuizArena.Core/*.csproj src/QuizArena.Core/
+COPY src/QuizArena.Infrastructure/*.csproj src/QuizArena.Infrastructure/
+COPY src/QuizArena.Api/*.csproj src/QuizArena.Api/
+RUN dotnet restore src/QuizArena.Api/QuizArena.Api.csproj
+COPY src/ src/
+RUN dotnet publish src/QuizArena.Api/QuizArena.Api.csproj -c Release -o /app/publish --no-restore
 
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
 COPY --from=build /app/publish .
 ENV ASPNETCORE_URLS=http://+:8080
 EXPOSE 8080
-ENTRYPOINT ["dotnet", "ExamHub.Api.dll"]
+ENTRYPOINT ["dotnet", "QuizArena.Api.dll"]

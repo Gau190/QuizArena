@@ -26,7 +26,7 @@
                     <option value="">Tất cả trạng thái</option>
                     @foreach (var status in Enum.GetValues<AttemptStatus>())
                     {
-                        <option value="@status" selected="@(status == selectedStatus)">@status</option>
+                        <option value="@status" selected="@(status == selectedStatus)">@Labels.Of(status)</option>
                     }
                 </select>
                 <button class="btn ghost" type="submit">Lọc</button>
@@ -50,7 +50,7 @@
         {
             <tr>
                 <td>@attempt.User?.FullName</td>
-                <td>@attempt.Status</td>
+                <td>@Labels.Of(attempt.Status)</td>
                 <td><div class="scorebar"><span style="width:@(((attempt.Score ?? 0) * 10).ToString("0"))%"></span></div>@((attempt.Score ?? 0).ToString("0.0"))</td>
                 <td>@(attempt.SubmittedAt?.ToLocalTime().ToString("dd/MM/yyyy HH:mm") ?? "-")</td>
             </tr>
@@ -70,9 +70,9 @@
             {
                 var rate = q.Total == 0 ? 0 : q.Correct * 100 / q.Total;
                 <tr>
-                    <td><b>Q@q.QuestionId</b></td>
+                    <td><b>Câu @(q.QuestionId)</b></td>
                     <td style="max-width:320px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">@q.Content</td>
-                    <td>@q.Type</td>
+                    <td>@Labels.Of(q.Type)</td>
                     <td>@q.Total</td>
                     <td class="green">@q.Correct</td>
                     <td class="red">@(q.Total - q.Correct)</td>

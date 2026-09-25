@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Text.Json;
 using QuizArena.Core.Entities;
 using QuizArena.Core.Enums;
@@ -18,7 +19,20 @@ public class ExamWorkflowService(
     // Network latency allowance when comparing client actions against the server-side deadline.
     private static readonly TimeSpan AnswerGrace = TimeSpan.FromSeconds(15);
 
+    // Khoá theo khoá nghiệp vụ để hai yêu cầu đồng thời (bắt đầu thi, nộp bài) không cùng đi qua bước kiểm tra.
+    // Có hiệu lực trong một tiến trình; nếu chạy nhiều máy chủ cần thêm ràng buộc duy nhất ở CSDL.
+    private static readonly ConcurrentDictionary<string, SemaphoreSlim> Gates = new();
+    private static SemaphoreSlim GateFor(string key) => Gates.GetOrAdd(key, _ => new SemaphoreSlim(1, 1));
+
     public async Task<Guid> StartAttemptAsync(int examId, Guid userId, string? ipAddress, CancellationToken cancellationToken = default)
+    {
+        var gate = GateFor($"start:{userId}:{examId}");
+        await gate.WaitAsync(cancellationToken);
+        try { return await StartAttemptCoreAsync(examId, userId, ipAddress, cancellationToken); }
+        finally { gate.Release(); }
+    }
+
+    private async Task<Guid> StartAttemptCoreAsync(int examId, Guid userId, string? ipAddress, CancellationToken cancellationToken)
     {
         var exam = await db.Exams.AsNoTracking()
             .Include(x => x.Classes)
@@ -141,6 +155,14 @@ public class ExamWorkflowService(
     }
 
     public async Task SubmitAsync(Guid attemptId, Guid userId, bool timedOut = false, CancellationToken cancellationToken = default)
+    {
+        var gate = GateFor($"submit:{attemptId}");
+        await gate.WaitAsync(cancellationToken);
+        try { await SubmitCoreAsync(attemptId, userId, timedOut, cancellationToken); }
+        finally { gate.Release(); }
+    }
+
+    private async Task SubmitCoreAsync(Guid attemptId, Guid userId, bool timedOut, CancellationToken cancellationToken)
     {
         var attempt = await db.ExamAttempts
             .Include(x => x.QuestionSnapshots.OrderBy(s => s.OrderIndex))

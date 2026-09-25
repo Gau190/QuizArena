@@ -34,7 +34,7 @@ public class AccountController(IAuthService authService) : Controller
         }
         catch (Exception ex) when (ex is SqlException or InvalidOperationException)
         {
-            ViewBag.Error = "Không thể kết nối cơ sở dữ liệu. Vui lòng kiểm tra SQL Server và ConnectionStrings__Default.";
+            ViewBag.Error = "Hệ thống đang gặp sự cố. Vui lòng thử lại sau hoặc liên hệ quản trị viên.";
             return View(model);
         }
 

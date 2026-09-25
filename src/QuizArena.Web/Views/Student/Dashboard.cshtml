@@ -1,6 +1,7 @@
 @using QuizArena.Core.Entities
 @using QuizArena.Core.Enums
 @model IReadOnlyList<Exam>
+@inject SchoolInfo School
 @{
     ViewData["Title"] = "Bảng điều khiển thí sinh";
     var attempts = (IReadOnlyList<ExamAttempt>)ViewBag.Attempts;
@@ -19,7 +20,7 @@
     decimal myAvg = ViewBag.MyAvg ?? avg;
     const decimal maxScore = 10m;
 
-    var fullName = User.FindFirst("full_name")?.Value ?? "Học sinh";
+    var fullName = User.FindFirst("full_name")?.Value ?? "Thí sinh";
     var initials = string.Join("", fullName.Split(' ', StringSplitOptions.RemoveEmptyEntries).TakeLast(2).Select(x => x[0])).ToUpperInvariant();
 
     var monthlyRaw = ViewBag.MonthlyScores as IList<object> ?? new List<object>();
@@ -65,7 +66,7 @@
                 <div class="stdp-info-row">
                     <i class="fa-solid fa-id-badge stdp-info-icon"></i>
                     <div>
-                        <div class="stdp-info-lbl">Mã HS</div>
+                        <div class="stdp-info-lbl">Mã thí sinh</div>
                         <div class="stdp-info-val">@profile.StudentCode</div>
                     </div>
                 </div>
@@ -76,7 +77,7 @@
                     <i class="fa-solid fa-school stdp-info-icon"></i>
                     <div>
                         <div class="stdp-info-lbl">Trường</div>
-                        <div class="stdp-info-val">THPT Chu Văn An</div>
+                        <div class="stdp-info-val">@await School.NameAsync()</div>
                     </div>
                 </div>
             }
@@ -95,7 +96,7 @@
                 <div class="stdp-info-row">
                     <i class="fa-solid fa-phone stdp-info-icon"></i>
                     <div>
-                        <div class="stdp-info-lbl">SĐT phụ huynh</div>
+                        <div class="stdp-info-lbl">Số điện thoại phụ huynh</div>
                         <div class="stdp-info-val">@profile.ParentPhone</div>
                     </div>
                 </div>
@@ -115,7 +116,7 @@
                 <div class="stdp-info-row">
                     <i class="fa-solid fa-chalkboard-user stdp-info-icon"></i>
                     <div>
-                        <div class="stdp-info-lbl">GVCN</div>
+                        <div class="stdp-info-lbl">Giáo viên chủ nhiệm</div>
                         <div class="stdp-info-val">@myClass.HomeTeacher.FullName</div>
                     </div>
                 </div>
@@ -164,7 +165,7 @@
             <div class="stdp-stat-grid">
                 <div class="stdp-stat-c">
                     <div class="stdp-stat-n" style="color:var(--primary)">@avg.ToString("0.0")</div>
-                    <div class="stdp-stat-l">Điểm TB</div>
+                    <div class="stdp-stat-l">Điểm trung bình</div>
                 </div>
                 <div class="stdp-stat-c">
                     <div class="stdp-stat-n">@completed</div>
@@ -232,7 +233,7 @@
                 <div class="stdp-sec">So sánh với lớp</div>
                 <div class="stdp-cmp-row">
                     <div class="stdp-cmp-head">
-                        <span style="color:var(--text-secondary);font-size:12px">Học sinh này</span>
+                        <span style="color:var(--text-secondary);font-size:12px">Thí sinh này</span>
                         <span style="color:var(--primary);font-weight:500;font-size:12px">@myAvg.ToString("0.0")</span>
                     </div>
                     <div class="stdp-cmp-bar"><div class="stdp-cmp-fill" data-w="@((int)(myAvg/maxScore*100))" style="background:#3B82F6"></div></div>
@@ -246,7 +247,7 @@
                 </div>
                 @if (classSize > 0)
                 {
-                    <p class="muted" style="font-size:11px;margin-top:6px">Xếp hạng @classRank / @classSize học sinh trong lớp</p>
+                    <p class="muted" style="font-size:11px;margin-top:6px">Xếp hạng @classRank / @classSize thí sinh trong lớp</p>
                 }
             </div>
         </div>

@@ -26,7 +26,7 @@
             <b>Báo cáo</b>
             <a class="active" href="#overview"><i class="fa-solid fa-chart-bar"></i> Tổng quan</a>
             <a href="#by-class"><i class="fa-solid fa-school"></i> Theo lớp</a>
-            <a href="#top-students"><i class="fa-solid fa-user-graduate"></i> Theo học sinh</a>
+            <a href="#top-students"><i class="fa-solid fa-user-graduate"></i> Theo thí sinh</a>
             <a href="#by-subject"><i class="fa-solid fa-book-open"></i> Theo môn</a>
             <b>Phân tích</b>
             <a href="#monthly"><i class="fa-solid fa-chart-line"></i> Tiến độ học tập</a>
@@ -125,9 +125,9 @@
             </div>
 
             <section id="top-students" class="panel">
-                <div class="panel-head tight"><h2>Top học sinh nổi bật</h2></div>
+                <div class="panel-head tight"><h2>Top thí sinh nổi bật</h2></div>
                 <table class="data-table">
-                    <thead><tr><th>#</th><th>Học sinh</th><th>Lớp</th><th>Điểm TB</th><th>Bài thi</th><th>Tỷ lệ đạt</th></tr></thead>
+                    <thead><tr><th>#</th><th>Thí sinh</th><th>Lớp</th><th>Điểm trung bình</th><th>Bài thi</th><th>Tỷ lệ đạt</th></tr></thead>
                     <tbody>
                     @foreach (var student in Model.TopStudents)
                     {
@@ -142,7 +142,7 @@
                     }
                     @if (Model.TopStudents.Count == 0)
                     {
-                        <tr><td colspan="6">Chưa có học sinh nào hoàn thành bài thi.</td></tr>
+                        <tr><td colspan="6">Chưa có thí sinh nào hoàn thành bài thi.</td></tr>
                     }
                     </tbody>
                 </table>

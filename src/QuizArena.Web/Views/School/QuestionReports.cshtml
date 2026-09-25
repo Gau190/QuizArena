@@ -7,7 +7,7 @@
     <div class="feature-head">
         <div>
             <h1>Phản hồi câu hỏi</h1>
-            <p>Học sinh báo câu hỏi sai hoặc chưa rõ, giáo viên rà soát và lưu lịch sử xử lý.</p>
+            <p>Thí sinh báo câu hỏi sai hoặc chưa rõ, giáo viên rà soát và lưu lịch sử xử lý.</p>
         </div>
         <a class="btn ghost" asp-controller="Teacher" asp-action="Questions"><i class="fa-solid fa-database"></i> Ngân hàng câu hỏi</a>
     </div>
@@ -24,7 +24,7 @@
             @foreach (var report in Model.Reports)
             {
                 <tr>
-                    <td><b>Q@report.QuestionId</b><small>@report.Content</small></td>
+                    <td><b>Câu @(report.QuestionId)</b><small>@report.Content</small></td>
                     <td>@report.Subject</td>
                     <td>@report.Reason</td>
                     <td>@report.Reporter</td>

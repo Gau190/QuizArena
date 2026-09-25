@@ -32,8 +32,7 @@ builder.Services.AddRateLimiter(opt =>
     });
 });
 
-var jwtSecret = builder.Configuration["Jwt:Secret"] ?? "dev-secret-change-me-32-characters-min";
-if (jwtSecret.Length < 32) jwtSecret = jwtSecret.PadRight(32, 'x');
+var jwtSecret = QuizArena.Infrastructure.Services.JwtSecret.Resolve(builder.Configuration);
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
 {

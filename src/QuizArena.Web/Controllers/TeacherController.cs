@@ -62,11 +62,17 @@ public class TeacherController(QuizArenaDbContext db) : AppController
 
     [HttpPost("/giang-vien/ngan-hang-cau-hoi/nhap")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> ImportQuestions(IFormFile file, int fallbackSubjectId)
+    public async Task<IActionResult> ImportQuestions(IFormFile? file, int fallbackSubjectId)
     {
-        if (file.Length == 0)
+        if (file is null || file.Length == 0)
         {
             TempData["TeacherMessage"] = "File import không có dữ liệu.";
+            return RedirectToAction(nameof(Questions));
+        }
+
+        if (!UploadRules.IsAllowedImport(file, [".csv", ".xlsx"], out var uploadError))
+        {
+            TempData["TeacherMessage"] = uploadError;
             return RedirectToAction(nameof(Questions));
         }
 
@@ -84,6 +90,12 @@ public class TeacherController(QuizArenaDbContext db) : AppController
         if (rows.Count <= 1)
         {
             TempData["TeacherMessage"] = "File import cần có dòng tiêu đề và ít nhất một câu hỏi.";
+            return RedirectToAction(nameof(Questions));
+        }
+
+        if (rows.Count > UploadRules.MaxImportRows + 1)
+        {
+            TempData["TeacherMessage"] = $"Tệp có quá nhiều dòng (tối đa {UploadRules.MaxImportRows} câu hỏi mỗi lần nhập).";
             return RedirectToAction(nameof(Questions));
         }
 

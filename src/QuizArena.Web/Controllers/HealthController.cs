@@ -29,8 +29,7 @@ public class HealthController(QuizArenaDbContext db) : ControllerBase
                 return StatusCode(StatusCodes.Status503ServiceUnavailable, new { status = "db_unavailable" });
             }
 
-            var users = await db.Users.AsNoTracking().CountAsync(cancellationToken);
-            return Ok(new { status = "ok", db = "ok", users, utc = DateTime.UtcNow });
+            return Ok(new { status = "ok", db = "ok", utc = DateTime.UtcNow });
         }
         catch
         {

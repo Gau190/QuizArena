@@ -7,10 +7,10 @@
     <div class="panel-head">
         <h1>Quản lý người dùng</h1>
         <form class="toolbar" method="get">
-            <input name="q" value="@Context.Request.Query["q"]" placeholder="Tìm theo tên, username..." />
+            <input name="q" value="@Context.Request.Query["q"]" placeholder="Tìm theo tên hoặc tên đăng nhập..." />
             <select name="role">
                 <option value="">Tất cả vai trò</option>
-                <option value="Admin">Admin</option>
+                <option value="Admin">Quản trị viên</option>
                 <option value="Teacher">Giáo viên</option>
                 <option value="Student">Thí sinh</option>
             </select>
@@ -25,16 +25,16 @@
 
     <form class="inline-form" method="post" asp-action="CreateUser">
         @Html.AntiForgeryToken()
-        <input name="username" placeholder="Username" required />
+        <input name="username" placeholder="Tên đăng nhập" required />
         <input name="fullName" placeholder="Họ tên" required />
         <input name="email" type="email" placeholder="Email" required />
         <input name="password" type="password" placeholder="Mật khẩu" required />
-        <select name="role" asp-items="Html.GetEnumSelectList<UserRole>()"></select>
+        <select name="role">@foreach (var r in Enum.GetValues<UserRole>()) {<option value="@r" selected="@(r == UserRole.Student)">@Labels.Of(r)</option>}</select>
         <button class="btn primary" type="submit">Thêm người dùng</button>
     </form>
 
     <table class="data-table">
-        <thead><tr><th>Người dùng</th><th>Username</th><th>Vai trò</th><th>Trạng thái</th><th>Đăng nhập cuối</th><th>Reset mật khẩu</th><th></th></tr></thead>
+        <thead><tr><th>Người dùng</th><th>Tên đăng nhập</th><th>Vai trò</th><th>Trạng thái</th><th>Đăng nhập cuối</th><th>Đặt lại mật khẩu</th><th></th></tr></thead>
         <tbody>
         @foreach (var user in Model)
         {
@@ -56,7 +56,7 @@
                     <select name="role" form="edit-user-@user.Id">
                         @foreach (var role in Enum.GetValues<UserRole>())
                         {
-                            <option value="@role" selected="@(role == user.Role)">@role</option>
+                            <option value="@role" selected="@(role == user.Role)">@Labels.Of(role)</option>
                         }
                     </select>
                 </td>
@@ -66,7 +66,7 @@
                     <form class="table-inline-form" method="post" asp-action="ResetUserPassword" asp-route-id="@user.Id">
                         @Html.AntiForgeryToken()
                         <input name="password" type="password" placeholder="Mật khẩu mới" minlength="6" required />
-                        <button class="btn ghost" type="submit">Reset</button>
+                        <button class="btn ghost" type="submit">Đặt lại</button>
                     </form>
                 </td>
                 <td>

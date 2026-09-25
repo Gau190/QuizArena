@@ -21,6 +21,7 @@ if (string.IsNullOrWhiteSpace(builder.Configuration["Jwt:Secret"]))
 
 builder.Services.AddQuizArenaInfrastructure(builder.Configuration);
 builder.Services.AddControllersWithViews();
+builder.Services.AddScoped<QuizArena.Web.Utilities.SchoolInfo>();
 builder.Services.AddAntiforgery();
 // Giới hạn theo địa chỉ IP (không dùng bộ đếm toàn cục để một người không khoá cả lớp).
 builder.Services.AddRateLimiter(opt =>
@@ -40,8 +41,7 @@ builder.Services.Configure<ForwardedHeadersOptions>(o =>
     o.KnownProxies.Clear();
 });
 
-var jwtSecret = builder.Configuration["Jwt:Secret"] ?? "dev-secret-change-me-32-characters-min";
-if (jwtSecret.Length < 32) jwtSecret = jwtSecret.PadRight(32, 'x');
+var jwtSecret = QuizArena.Infrastructure.Services.JwtSecret.Resolve(builder.Configuration);
 
 builder.Services
     .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)

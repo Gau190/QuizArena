@@ -7,7 +7,7 @@
     <div class="feature-head">
         <div>
             <h1>Lớp học</h1>
-            <p>Tạo lớp, phân công giáo viên chủ nhiệm và theo dõi danh sách học sinh.</p>
+            <p>Tạo lớp, phân công giáo viên chủ nhiệm và theo dõi danh sách thí sinh.</p>
         </div>
         <div class="head-actions">
             <button class="btn primary" type="submit" form="create-class-form"><i class="fa-solid fa-plus"></i> Tạo lớp</button>
@@ -37,7 +37,7 @@
             <option>Ôn thi tốt nghiệp</option>
         </select>
         <select name="homeTeacherId">
-            <option value="">Chưa phân công GVCN</option>
+            <option value="">Chưa phân công Giáo viên chủ nhiệm</option>
             @foreach (var teacher in Model.Teachers)
             {
                 <option value="@teacher.Id">@teacher.FullName</option>
@@ -56,12 +56,12 @@
     <form class="inline-form" method="post" asp-action="ImportClasses" enctype="multipart/form-data">
         @Html.AntiForgeryToken()
         <input type="file" name="file" accept=".csv,text/csv" required />
-        <span class="muted">CSV: username, fullName, email, role, className, password</span>
+        <span class="muted">Tệp CSV, dòng đầu là tên cột: username (tên đăng nhập), fullName (họ tên), email, role (Teacher / Student), className (tên lớp), password (mật khẩu).</span>
         <button class="btn ghost" type="submit"><i class="fa-solid fa-upload"></i> Import CSV</button>
     </form>
 
     <form class="filters-strip" method="get">
-        <input name="q" value="@Context.Request.Query["q"]" placeholder="Tìm học sinh..." />
+        <input name="q" value="@Context.Request.Query["q"]" placeholder="Tìm thí sinh..." />
         <select name="grade"><option value="">Tất cả khối</option><option>Khối 12</option><option>Khối 11</option><option>Khối 10</option></select>
         <select name="academicYearId">
             @foreach (var year in Model.AcademicYears)
@@ -78,10 +78,10 @@
             <article class="class-card @(item.IsSelected ? "selected" : "")">
                 <div>
                     <h2>@item.Name</h2>
-                    <p>GVCN: @item.HomeTeacher · @item.Room · @item.Track</p>
+                    <p>Giáo viên chủ nhiệm: @item.HomeTeacher · @item.Room · @item.Track</p>
                 </div>
                 <div class="class-stats">
-                    <b>@item.StudentCount <span>học sinh</span></b>
+                    <b>@item.StudentCount <span>thí sinh</span></b>
                     <b class="blue">@item.AverageScore.ToString("0.0") <span>điểm TB</span></b>
                 </div>
                 <form class="compact-edit-form" method="post" asp-action="UpdateClass" asp-route-id="@item.Id">
@@ -125,14 +125,14 @@
 
     <section class="panel">
         <div class="panel-head tight">
-            <h2>Danh sách học sinh theo lớp</h2>
+            <h2>Danh sách thí sinh theo lớp</h2>
             <div class="head-actions">
                 <a class="btn ghost" asp-action="ExportClasses"><i class="fa-solid fa-file-excel"></i> Xuất Excel</a>
-                <a class="btn primary" asp-action="Users"><i class="fa-solid fa-user-plus"></i> Thêm học sinh</a>
+                <a class="btn primary" asp-action="Users"><i class="fa-solid fa-user-plus"></i> Thêm thí sinh</a>
             </div>
         </div>
         <table class="data-table">
-            <thead><tr><th>Học sinh</th><th>Mã HS</th><th>Email</th><th>Lớp hiện tại</th><th>Chuyển lớp</th><th>Trạng thái</th><th></th></tr></thead>
+            <thead><tr><th>Thí sinh</th><th>Mã thí sinh</th><th>Email</th><th>Lớp hiện tại</th><th>Chuyển lớp</th><th>Trạng thái</th><th></th></tr></thead>
             <tbody>
             @foreach (var row in Model.Students)
             {

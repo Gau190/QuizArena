@@ -14,11 +14,7 @@ public class JwtTokenService(IConfiguration configuration)
     {
         var expiry = int.TryParse(configuration["Jwt:ExpiryMinutes"], out var parsedExpiry) ? parsedExpiry : 60;
         var expiresAt = rememberMe ? DateTime.UtcNow.AddDays(14) : DateTime.UtcNow.AddMinutes(expiry);
-        var secret = string.IsNullOrWhiteSpace(configuration["Jwt:Secret"])
-            ? Environment.GetEnvironmentVariable("JWT_SECRET")
-            : configuration["Jwt:Secret"];
-        secret ??= "dev-secret-change-me-32-characters-min";
-        if (secret.Length < 32) secret = secret.PadRight(32, 'x');
+        var secret = JwtSecret.Resolve(configuration);
 
         var claims = new[]
         {

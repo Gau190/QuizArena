@@ -91,6 +91,18 @@ for cl, paths in PAGES.items():
         ok = r.status_code == 200 or (p.endswith("/xuat") and r.status_code in (200, 404))
         check("Trang chính", f"GET {p}", ok, f"({r.status_code})")
 
+# Thuật ngữ thống nhất: không còn "Giảng viên", "Học sinh", "GVCN", enum thô trên các trang chính
+bad_terms = ("Giảng viên", "Học sinh", "GVCN", "SĐT", "Điểm TB")
+for cl, paths in PAGES.items():
+    for p in paths:
+        t = cl.get(p).utext
+        if any(b in t for b in bad_terms):
+            check("Thuật ngữ", f"{p} dùng thống nhất Giáo viên/Thí sinh", False, [b for b in bad_terms if b in t][0])
+            break
+    else:
+        check("Thuật ngữ", "Các trang chính dùng thống nhất Giáo viên/Thí sinh, không viết tắt", True)
+r = c.get("/trang-thai/csdl"); check("Bảo mật", "/trang-thai/csdl không lộ số tài khoản", r.status_code == 200 and "users" not in r.text)
+
 # ---------- 5. Quản trị: người dùng, môn thi ----------
 uname = "e2e_" + uuid.uuid4().hex[:6]
 r = admin.post("/quan-tri/nguoi-dung", {"username": uname, "email": uname + "@t.vn", "fullName": "E2E Tester", "password": "abc", "role": "Student"}, page="/quan-tri/nguoi-dung")
@@ -125,6 +137,7 @@ qtxt = "Câu E2E <script>alert(1)</script> " + uuid.uuid4().hex[:5]
 tk.post("/giang-vien/ngan-hang-cau-hoi", {"subjectId": sid, "content": qtxt, "type": "SingleChoice", "difficulty": "Easy", "points": "1", "answers": "A\nB\nC\nD", "correct": "2"}, page="/giang-vien/ngan-hang-cau-hoi")
 hr = tk.get("/giang-vien/ngan-hang-cau-hoi?q=E2E"); h = hr.utext
 check("Giảng viên", "Thêm câu hỏi vào ngân hàng", "Câu E2E" in h)
+check("Giao diện", "Ngân hàng câu hỏi hiện nhãn tiếng Việt, không hiện enum thô", "Một đáp án" in h and 'class="badge">SingleChoice' not in hr.text and 'class="badge">Easy' not in hr.text)
 check("Bảo mật", "XSS được mã hoá khi hiển thị", "<script>alert(1)</script>" not in hr.text and "&lt;script&gt;" in hr.text)
 bad = "Câu sai luật " + uuid.uuid4().hex[:5]
 tk.post("/giang-vien/ngan-hang-cau-hoi", {"subjectId": sid, "content": bad, "type": "SingleChoice", "difficulty": "Easy", "points": "1", "answers": "A\nB", "correct": "1,2"}, page="/giang-vien/ngan-hang-cau-hoi")
@@ -145,6 +158,22 @@ check("Xuất file", "Báo cáo xuất .xlsx hợp lệ (zip)", r.status_code ==
 r = admin.get("/quan-tri/lop-hoc/xuat")
 check("Xuất file", "Danh sách lớp xuất được", r.status_code == 200 and len(r.content) > 50, f"({r.status_code})")
 
+# Giới hạn tải tệp
+tok = token(tk.get("/giang-vien/ngan-hang-cau-hoi").text)
+r = tk.s.post(BASE + "/giang-vien/ngan-hang-cau-hoi/nhap", data={"__RequestVerificationToken": tok, "fallbackSubjectId": sid}, files={"file": ("q.txt", b"content\nx", "text/plain")}, allow_redirects=True)
+check("Tải tệp", "Tệp .txt bị từ chối", "Chỉ nhận" in r.utext)
+r = tk.s.post(BASE + "/giang-vien/ngan-hang-cau-hoi/nhap", data={"__RequestVerificationToken": tok, "fallbackSubjectId": sid}, files={"file": ("big.csv", b"content\n" + b"x" * (3 * 1024 * 1024), "text/csv")}, allow_redirects=True)
+check("Tải tệp", "Tệp CSV lớn hơn 2 MB bị từ chối", "quá lớn" in r.utext)
+r = tk.s.post(BASE + "/giang-vien/ngan-hang-cau-hoi/nhap", data={"__RequestVerificationToken": tok, "fallbackSubjectId": sid}, allow_redirects=True)
+check("Tải tệp", "Thiếu tệp không gây lỗi 500", r.status_code == 200)
+tokA = token(admin.get("/quan-tri/cai-dat").text)
+r = admin.s.post(BASE + "/quan-tri/cai-dat/logo", data={"__RequestVerificationToken": tokA}, files={"logo": ("x.png", b"<?php echo 1; ?> not an image at all", "image/png")}, allow_redirects=True)
+check("Tải tệp", "Logo giả (đuôi .png nhưng không phải ảnh) bị từ chối", "không phải ảnh" in r.utext)
+# Tạo thí sinh mới có hồ sơ, hiện trong danh sách lớp
+nu = "e2e_ts_" + uuid.uuid4().hex[:5]
+admin.post("/quan-tri/nguoi-dung", {"username": nu, "email": nu + "@t.vn", "fullName": "E2E Thí Sinh Mới", "password": "Abc12345", "role": "Student"}, page="/quan-tri/nguoi-dung")
+check("Admin", "Thí sinh mới tạo có hồ sơ và hiện trong danh sách lớp", "E2E Thí Sinh Mới" in admin.get("/quan-tri/lop-hoc").utext)
+
 # ---------- 7. Thí sinh: luồng thi ----------
 dash = st.get("/thi-sinh").utext
 exam_ids = re.findall(r'/thi-sinh/bat-dau/(\d+)', dash)
@@ -158,8 +187,14 @@ if exam_ids:
     if m: attempt = m.group(1)
 if attempt:
     # Hai thí sinh cùng kỳ thi phải nhận đề khác nhau (ngẫu nhiên)
-    r2 = st2.post(f"/thi-sinh/bat-dau/{exam_ids[0]}", page="/thi-sinh")
-    m2 = re.search(r'/thi-sinh/lam-bai/([0-9a-f-]{36})', r2.headers.get("Location", ""))
+    import concurrent.futures as cf
+    tk2 = token(st2.get("/thi-sinh").text)
+    def _start(_):
+        return st2.s.post(BASE + f"/thi-sinh/bat-dau/{exam_ids[0]}", data={"__RequestVerificationToken": tk2}, allow_redirects=False).headers.get("Location", "")
+    with cf.ThreadPoolExecutor(10) as ex: locs = list(ex.map(_start, range(10)))
+    got = set(re.findall(r'/thi-sinh/lam-bai/([0-9a-f-]{36})', ";".join(locs)))
+    check("Đồng thời", "10 yêu cầu bắt đầu thi cùng lúc chỉ tạo đúng 1 lượt", len(got) == 1, f"({len(got)} lượt)")
+    m2 = re.search(r'/thi-sinh/lam-bai/([0-9a-f-]{36})', ";".join(locs))
     def paper(cl, att):
         out, i = [], 1
         while True:

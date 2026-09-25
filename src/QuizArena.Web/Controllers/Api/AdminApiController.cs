@@ -58,6 +58,11 @@ public class AdminApiController(QuizArenaDbContext db) : ControllerBase
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(input.Password, 12)
         };
         db.Users.Add(user);
+        if (user.Role == UserRole.Student)
+        {
+            db.StudentProfiles.Add(new StudentProfile { UserId = user.Id, StudentCode = $"TS-{user.Id.ToString()[..4].ToUpperInvariant()}", Conduct = "Tốt" });
+        }
+
         await db.SaveChangesAsync();
         return Created($"/api/v1/admin/users/{user.Id}", ToDto(user));
     }

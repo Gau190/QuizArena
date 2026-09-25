@@ -194,7 +194,7 @@ public class SchoolController(QuizArenaDbContext db, IAuthService authService) :
 
         if (!string.IsNullOrWhiteSpace(studentCode) && await db.StudentProfiles.AnyAsync(x => x.UserId != id && x.StudentCode == studentCode.Trim()))
         {
-            TempData["SchoolMessage"] = "Mã học sinh đã tồn tại.";
+            TempData["SchoolMessage"] = "Mã thí sinh đã tồn tại.";
             return RedirectToAction(nameof(StudentProfile), new { id });
         }
 
@@ -233,7 +233,7 @@ public class SchoolController(QuizArenaDbContext db, IAuthService authService) :
         }
 
         await db.SaveChangesAsync();
-        TempData["SchoolMessage"] = "Đã cập nhật hồ sơ học sinh.";
+        TempData["SchoolMessage"] = "Đã cập nhật hồ sơ thí sinh.";
         return RedirectToAction(nameof(StudentProfile), new { id });
     }
 
@@ -668,7 +668,7 @@ public class SchoolController(QuizArenaDbContext db, IAuthService authService) :
             WebUtility.HtmlDecode(report.Question?.Subject?.Name ?? "Môn thi"),
             report.Question?.Content ?? "Câu hỏi đã bị xóa",
             report.Reason,
-            report.Reporter?.FullName ?? "Học sinh",
+            report.Reporter?.FullName ?? "Thí sinh",
             report.Status == "Resolved" ? "Đã xử lý" : "Chờ duyệt",
             report.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy"))).ToList();
 
@@ -691,7 +691,7 @@ public class SchoolController(QuizArenaDbContext db, IAuthService authService) :
             .FirstOrDefaultAsync();
         if (report is null)
         {
-            TempData["SchoolMessage"] = "Chưa có phản hồi thật để xử lý.";
+            TempData["SchoolMessage"] = "Không có phản hồi nào cần xử lý.";
             return RedirectToAction(nameof(QuestionReports));
         }
 
@@ -797,7 +797,7 @@ public class SchoolController(QuizArenaDbContext db, IAuthService authService) :
             completed.Count,
             passRate,
             assignment?.Class?.Name ?? "Chưa xếp lớp",
-            profile?.StudentCode ?? $"HS-{student.Id.ToString()[..4].ToUpperInvariant()}",
+            profile?.StudentCode ?? $"TS-{student.Id.ToString()[..4].ToUpperInvariant()}",
             classRank,
             classStudentCount,
             classAverage,

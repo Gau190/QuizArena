@@ -1,4 +1,5 @@
 @model TranscriptViewModel
+@inject SchoolInfo School
 @{
     ViewData["Title"] = "Học bạ điện tử";
     var term = Model.Term;
@@ -27,15 +28,15 @@
                 <span class="badge">Hạnh kiểm: @(Model.Profile.Profile?.Conduct ?? "Tốt")</span>
             </div>
             <div class="info-list">
-                <div><span>Trường</span><b>QuizArena School</b></div>
+                <div><span>Trường</span><b>@await School.NameAsync()</b></div>
                 <div><span>Phụ huynh</span><b>@(Model.Profile.Profile?.ParentName ?? "Chưa cập nhật")</b></div>
-                <div><span>SĐT PH</span><b>@(Model.Profile.Profile?.ParentPhone ?? "Chưa cập nhật")</b></div>
+                <div><span>Số điện thoại phụ huynh</span><b>@(Model.Profile.Profile?.ParentPhone ?? "Chưa cập nhật")</b></div>
             </div>
         </aside>
 
         <section class="panel">
             <div class="feature-stats compact-stats">
-                <article class="metric-card primary"><span>Điểm TB</span><b>@Model.Profile.AverageScore.ToString("0.0")</b><small>toàn kỳ</small></article>
+                <article class="metric-card primary"><span>Điểm trung bình</span><b>@Model.Profile.AverageScore.ToString("0.0")</b><small>toàn kỳ</small></article>
                 <article class="metric-card"><span>Bài đã thi</span><b>@Model.Profile.CompletedAttempts</b><small>lượt</small></article>
                 <article class="metric-card success"><span>Tỷ lệ đạt</span><b>@Model.Profile.PassRate%</b><small>điểm từ 5</small></article>
                 <article class="metric-card warning"><span>Xếp hạng lớp</span><b>@Model.RankLabel</b><small>theo điểm TB lớp</small></article>

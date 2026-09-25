@@ -115,7 +115,7 @@ public static class SeedData
                 db.StudentProfiles.Add(new StudentProfile
                 {
                     UserId = user.Id,
-                    StudentCode = $"HS-{user.Id.ToString()[..4].ToUpperInvariant()}",
+                    StudentCode = $"TS-{user.Id.ToString()[..4].ToUpperInvariant()}",
                     ParentName = "Nguyễn Văn Hùng",
                     ParentPhone = "0912 345 678",
                     Conduct = "Tốt",

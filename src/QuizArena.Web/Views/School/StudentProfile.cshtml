@@ -1,6 +1,7 @@
 @model StudentProfileViewModel
+@inject SchoolInfo School
 @{
-    ViewData["Title"] = "Hồ sơ học sinh";
+    ViewData["Title"] = "Hồ sơ thí sinh";
     var classes = (IReadOnlyList<QuizArena.Core.Entities.SchoolClass>?)ViewBag.Classes ?? [];
     var canEdit = User.IsInRole("Admin") || User.IsInRole("Teacher");
     var isStudent = User.IsInRole("Student");
@@ -21,7 +22,7 @@
         </div>
         <div class="info-list">
             <div><i class="fa-solid fa-envelope"></i><span>@Model.Student.Email</span></div>
-            <div><i class="fa-solid fa-building-columns"></i><span>QuizArena School</span></div>
+            <div><i class="fa-solid fa-building-columns"></i><span>@await School.NameAsync()</span></div>
             <div><i class="fa-solid fa-calendar"></i><span>Niên khóa 2025-2026</span></div>
             <div><i class="fa-solid fa-phone"></i><span>@(Model.Profile?.ParentPhone ?? "Chưa cập nhật")</span></div>
         </div>
@@ -46,7 +47,7 @@
         @if (tab == "overview")
         {
             <div class="feature-stats">
-                <article class="metric-card primary"><span>Điểm TB</span><b>@Model.AverageScore.ToString("0.0")</b><small>/ 10.0</small></article>
+                <article class="metric-card primary"><span>Điểm trung bình</span><b>@Model.AverageScore.ToString("0.0")</b><small>/ 10.0</small></article>
                 <article class="metric-card"><span>Bài đã thi</span><b>@Model.CompletedAttempts</b><small>đã có điểm</small></article>
                 <article class="metric-card success"><span>Tỷ lệ đạt</span><b>@Model.PassRate%</b><small>điểm từ 5</small></article>
                 <article class="metric-card warning"><span>Xếp hạng lớp</span><b>@rankLabel</b><small>theo điểm TB lớp</small></article>
@@ -92,7 +93,7 @@
                 <section class="panel profile-compare">
                     <div class="panel-head tight"><h2>So sánh với lớp</h2></div>
                     <div class="compare-row">
-                        <div class="compare-head"><span>Học sinh này</span><b>@Model.AverageScore.ToString("0.0")</b></div>
+                        <div class="compare-head"><span>Thí sinh này</span><b>@Model.AverageScore.ToString("0.0")</b></div>
                         <div class="scorebar"><span style="width:@(Math.Min(100, (int)(Model.AverageScore * 10)))%;background:#3B82F6"></span></div>
                     </div>
                     <div class="compare-row">
@@ -115,7 +116,7 @@
                         <tr>
                             <td><b>@attempt.Exam?.Title</b></td>
                             <td>@attempt.Exam?.Subject?.Name</td>
-                            <td>@attempt.Status</td>
+                            <td>@Labels.Of(attempt.Status)</td>
                             <td>@((attempt.Score ?? 0).ToString("0.0"))</td>
                             <td>@(attempt.SubmittedAt?.ToLocalTime().ToString("dd/MM/yyyy HH:mm") ?? "-")</td>
                             <td>
@@ -161,7 +162,7 @@
                     @Html.AntiForgeryToken()
                     <label>Họ tên<input name="fullName" value="@Model.Student.FullName" required /></label>
                     <label>Email<input name="email" type="email" value="@Model.Student.Email" required /></label>
-                    <label>Mã học sinh<input name="studentCode" value="@Model.StudentCode" required /></label>
+                    <label>Mã thí sinh<input name="studentCode" value="@Model.StudentCode" required /></label>
                     <label>Giới tính
                         <select name="gender">
                             <option value="">Chưa chọn</option>
@@ -182,7 +183,7 @@
                         </select>
                     </label>
                     <label>Phụ huynh<input name="parentName" value="@Model.Profile?.ParentName" /></label>
-                    <label>SĐT phụ huynh<input name="parentPhone" value="@Model.Profile?.ParentPhone" /></label>
+                    <label>Số điện thoại phụ huynh<input name="parentPhone" value="@Model.Profile?.ParentPhone" /></label>
                     <label>Email phụ huynh<input name="parentEmail" type="email" value="@Model.Profile?.ParentEmail" /></label>
                     <label>Hạnh kiểm
                         <select name="conduct">

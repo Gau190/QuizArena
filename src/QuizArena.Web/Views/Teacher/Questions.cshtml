@@ -40,7 +40,7 @@
             <option value="">Tất cả loại</option>
             @foreach (var type in Enum.GetValues<QuestionType>())
             {
-                <option value="@type" selected="@(type == selectedType)">@type</option>
+                <option value="@type" selected="@(type == selectedType)">@Labels.Of(type)</option>
             }
         </select>
         <select name="difficulty">
@@ -56,11 +56,11 @@
     <form class="question-form" method="post" asp-action="CreateQuestion">
         @Html.AntiForgeryToken()
         <select name="subjectId">@foreach (var subject in subjects) { <option value="@subject.Id">@System.Net.WebUtility.HtmlDecode(subject.Name)</option> }</select>
-        <select name="type" asp-items="Html.GetEnumSelectList<QuestionType>()"></select>
-        <select name="difficulty" asp-items="Html.GetEnumSelectList<Difficulty>()"></select>
+        <select name="type">@foreach (var t in Enum.GetValues<QuestionType>()) {<option value="@t">@Labels.Of(t)</option>}</select>
+        <select name="difficulty">@foreach (var d in Enum.GetValues<Difficulty>()) {<option value="@d" selected="@(d == Difficulty.Medium)">@Labels.Of(d)</option>}</select>
         <input name="points" type="number" min="0.25" step="0.25" value="1" />
         <textarea name="content" placeholder="Nội dung câu hỏi" required></textarea>
-        <textarea name="answers" placeholder="Mỗi đáp án một dòng. TextAnswer nhập đáp án chuẩn." required></textarea>
+        <textarea name="answers" placeholder="Mỗi đáp án một dòng. Với câu điền đáp án, nhập đáp án chuẩn." required></textarea>
         <input name="correct" placeholder="Đáp án đúng: số thứ tự hoặc nội dung, cách nhau bằng dấu phẩy" required />
         <input name="explanation" placeholder="Giải thích đáp án (không bắt buộc, hiện ở trang xem lại kết quả)" maxlength="1000" />
         <button class="btn primary" type="submit">Thêm câu hỏi</button>
@@ -70,7 +70,7 @@
         @Html.AntiForgeryToken()
         <select name="fallbackSubjectId">@foreach (var subject in subjects) { <option value="@subject.Id">@System.Net.WebUtility.HtmlDecode(subject.Name)</option> }</select>
         <input name="file" type="file" accept=".csv,.xlsx" required />
-        <span class="muted-help">Header: Type, Difficulty, Points, Content, Answers, Correct, SubjectId/Subject. Answers tách bằng dấu |.</span>
+        <span class="muted-help">Dòng đầu là tên cột: content (nội dung), type (SingleChoice / MultipleChoice / TextAnswer), difficulty (Easy / Medium / Hard), points (điểm), answers (các đáp án cách nhau bằng dấu |), correct (đáp án đúng), explanation (giải thích), subject (tên môn). Chỉ cột content là bắt buộc.</span>
         <button class="btn ghost" type="submit"><i class="fa-solid fa-file-import"></i> Import CSV/XLSX</button>
     </form>
 
@@ -81,12 +81,12 @@
             var correctText = string.Join(",", question.Answers.OrderBy(x => x.OrderIndex).Where(x => x.IsCorrect).Select(x => x.OrderIndex.ToString()));
             var canManage = User.IsInRole(nameof(UserRole.Admin)) || question.CreatedBy == currentUserId;
             <article class="question-item">
-                <div class="q-index">Q@(question.Id)</div>
+                <div class="q-index">Câu @(question.Id)</div>
                 <div>
                     <div class="q-tags">
-                        <span class="badge">@question.Type</span>
+                        <span class="badge">@Labels.Of(question.Type)</span>
                         <span class="badge subject">@System.Net.WebUtility.HtmlDecode(question.Subject?.Name)</span>
-                        <span class="badge">@question.Difficulty</span>
+                        <span class="badge">@Labels.Of(question.Difficulty)</span>
                         <span class="badge @(question.IsActive ? "student" : "")">@(question.IsActive ? "Đang dùng" : "Đã tắt")</span>
                     </div>
                     <h3>@question.Content</h3>
@@ -109,13 +109,13 @@
                             <select name="type">
                                 @foreach (var type in Enum.GetValues<QuestionType>())
                                 {
-                                    <option value="@type" selected="@(type == question.Type)">@type</option>
+                                    <option value="@type" selected="@(type == question.Type)">@Labels.Of(type)</option>
                                 }
                             </select>
                             <select name="difficulty">
                                 @foreach (var difficulty in Enum.GetValues<Difficulty>())
                                 {
-                                    <option value="@difficulty" selected="@(difficulty == question.Difficulty)">@difficulty</option>
+                                    <option value="@difficulty" selected="@(difficulty == question.Difficulty)">@Labels.Of(difficulty)</option>
                                 }
                             </select>
                             <input name="points" type="number" min="0.25" step="0.25" value="@question.Points.ToString("0.##")" />

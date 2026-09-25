@@ -1,4 +1,5 @@
 using QuizArena.Core.Entities;
+using QuizArena.Web.Utilities;
 using QuizArena.Core.Enums;
 using QuizArena.Infrastructure.Data;
 using QuizArena.Web.Models;
@@ -42,7 +43,7 @@ public class AdminController(QuizArenaDbContext db, IMemoryCache cache, IWebHost
 
         var model = new AdminDashboardViewModel(
             [
-                new("Tổng học sinh", users.Count(x => x.Role == UserRole.Student).ToString(), "+ dữ liệu theo tài khoản hiện có", "primary"),
+                new("Tổng thí sinh", users.Count(x => x.Role == UserRole.Student).ToString(), "+ dữ liệu theo tài khoản hiện có", "primary"),
                 new("Giáo viên", users.Count(x => x.Role == UserRole.Teacher).ToString(), "quản lý ngân hàng câu hỏi", "success"),
                 new("Kỳ thi đang mở", exams.Count(x => x.IsActive && x.StartTime <= now && x.EndTime >= now).ToString(), "đang trong thời gian làm bài", "warning"),
                 new("Câu hỏi", questionCount.ToString("N0"), "trong ngân hàng đề", "purple")
@@ -90,7 +91,13 @@ public class AdminController(QuizArenaDbContext db, IMemoryCache cache, IWebHost
             return RedirectToAction(nameof(Users));
         }
 
-        db.Users.Add(new User { Username = username, Email = email, FullName = fullName.Trim(), PasswordHash = BCrypt.Net.BCrypt.HashPassword(password, 12), Role = role });
+        var created = new User { Username = username, Email = email, FullName = fullName.Trim(), PasswordHash = BCrypt.Net.BCrypt.HashPassword(password, 12), Role = role };
+        db.Users.Add(created);
+        if (role == UserRole.Student)
+        {
+            db.StudentProfiles.Add(new StudentProfile { UserId = created.Id, StudentCode = $"TS-{created.Id.ToString()[..4].ToUpperInvariant()}", Conduct = "Tốt" });
+        }
+
         await db.SaveChangesAsync();
         TempData["AdminMessage"] = $"Đã tạo tài khoản {username}.";
         return RedirectToAction(nameof(Users));
@@ -331,7 +338,7 @@ public class AdminController(QuizArenaDbContext db, IMemoryCache cache, IWebHost
             classStudentMap.TryGetValue(student.Id, out var assignment);
             return new StudentAssignmentRow(
                 student,
-                studentProfiles.GetValueOrDefault(student.Id, $"HS-{student.Id.ToString()[..4].ToUpperInvariant()}"),
+                studentProfiles.GetValueOrDefault(student.Id, $"TS-{student.Id.ToString()[..4].ToUpperInvariant()}"),
                 assignment?.ClassId,
                 assignment?.Class?.Name ?? "Chưa xếp lớp",
                 assignment?.IsActive ?? student.IsActive);
@@ -426,7 +433,7 @@ public class AdminController(QuizArenaDbContext db, IMemoryCache cache, IWebHost
             IsActive = true
         });
         await db.SaveChangesAsync();
-        TempData["AdminMessage"] = $"Đã chuyển học sinh sang lớp {targetClass.Name}.";
+        TempData["AdminMessage"] = $"Đã chuyển thí sinh sang lớp {targetClass.Name}.";
         return RedirectToAction(nameof(Classes));
     }
 
@@ -440,7 +447,7 @@ public class AdminController(QuizArenaDbContext db, IMemoryCache cache, IWebHost
         if (schoolClass is null) return NotFound();
         if (schoolClass.Students.Any())
         {
-            TempData["AdminMessage"] = $"Không thể xóa lớp {schoolClass.Name} vì vẫn còn học sinh. Hãy chuyển học sinh sang lớp khác trước.";
+            TempData["AdminMessage"] = $"Không thể xóa lớp {schoolClass.Name} vì vẫn còn thí sinh. Hãy chuyển thí sinh sang lớp khác trước.";
             return RedirectToAction(nameof(Classes));
         }
 
@@ -467,6 +474,12 @@ public class AdminController(QuizArenaDbContext db, IMemoryCache cache, IWebHost
             return RedirectToAction(nameof(Classes));
         }
 
+        if (!UploadRules.IsAllowedImport(file, [".csv"], out var uploadError))
+        {
+            TempData["AdminMessage"] = uploadError;
+            return RedirectToAction(nameof(Classes));
+        }
+
         var organization = await GetOrCreateOrganizationAsync();
         var academicYear = await GetOrCreateCurrentAcademicYearAsync(organization.Id);
         var teachers = await db.Users.Where(x => x.Role == UserRole.Teacher).ToListAsync();
@@ -480,6 +493,11 @@ public class AdminController(QuizArenaDbContext db, IMemoryCache cache, IWebHost
         {
             var line = await reader.ReadLineAsync();
             lineNumber++;
+            if (lineNumber > UploadRules.MaxImportRows + 1)
+            {
+                TempData["AdminMessage"] = $"Tệp có quá nhiều dòng, chỉ xử lý {UploadRules.MaxImportRows} dòng đầu.";
+                break;
+            }
             if (string.IsNullOrWhiteSpace(line)) continue;
             if (lineNumber == 1 && line.Contains("username", StringComparison.OrdinalIgnoreCase)) continue;
 
@@ -546,7 +564,7 @@ public class AdminController(QuizArenaDbContext db, IMemoryCache cache, IWebHost
                 db.StudentProfiles.Add(new StudentProfile
                 {
                     UserId = user.Id,
-                    StudentCode = $"HS-{user.Id.ToString()[..4].ToUpperInvariant()}",
+                    StudentCode = $"TS-{user.Id.ToString()[..4].ToUpperInvariant()}",
                     Conduct = "Tốt"
                 });
             }
@@ -564,7 +582,7 @@ public class AdminController(QuizArenaDbContext db, IMemoryCache cache, IWebHost
         }
 
         await db.SaveChangesAsync();
-        TempData["AdminMessage"] = $"Import xong: tạo {createdUsers} tài khoản, {createdClasses} lớp, xếp lớp {assignedStudents} học sinh.";
+        TempData["AdminMessage"] = $"Import xong: tạo {createdUsers} tài khoản, {createdClasses} lớp, xếp lớp {assignedStudents} thí sinh.";
         return RedirectToAction(nameof(Classes));
     }
 
@@ -885,6 +903,7 @@ public class AdminController(QuizArenaDbContext db, IMemoryCache cache, IWebHost
         organization.Website = website?.Trim();
         organization.Description = description?.Trim();
         await db.SaveChangesAsync();
+        cache.Remove("school_name");
 
         TempData["SettingsMessage"] = "Đã lưu thông tin tổ chức.";
         return RedirectToAction(nameof(Settings));
@@ -936,6 +955,12 @@ public class AdminController(QuizArenaDbContext db, IMemoryCache cache, IWebHost
         if (logo.Length > 2 * 1024 * 1024)
         {
             TempData["SettingsMessage"] = "Logo cần nhỏ hơn 2MB.";
+            return RedirectToAction(nameof(Settings));
+        }
+
+        if (!await UploadRules.LooksLikeImageAsync(logo))
+        {
+            TempData["SettingsMessage"] = "Tệp không phải ảnh JPG, PNG hoặc WEBP hợp lệ.";
             return RedirectToAction(nameof(Settings));
         }
 
@@ -1053,7 +1078,7 @@ public class AdminController(QuizArenaDbContext db, IMemoryCache cache, IWebHost
     {
         return string.Join(",", values.Select(value =>
         {
-            var text = value ?? "";
+            var text = UploadRules.SafeCell(value);
             return $"\"{text.Replace("\"", "\"\"")}\"";
         }));
     }

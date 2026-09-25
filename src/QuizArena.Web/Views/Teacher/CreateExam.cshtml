@@ -43,7 +43,7 @@
                     <label>Kết thúc<input name="endTime" type="datetime-local" value="@DateTime.Now.AddDays(1).AddHours(2).ToString("yyyy-MM-ddTHH:mm")" required /></label>
                     <label>Thời lượng làm bài<input name="durationMinutes" type="number" value="45" min="1" required /></label>
                     <label>Số lần thi tối đa<input name="maxAttempts" type="number" value="1" min="1" required /></label>
-                    <label class="wide">Mô tả<input name="description" placeholder="Ghi chú cho học sinh hoặc phạm vi ôn tập" /></label>
+                    <label class="wide">Mô tả<input name="description" placeholder="Ghi chú cho thí sinh hoặc phạm vi ôn tập" /></label>
                 </div>
             </div>
         </section>
@@ -168,7 +168,7 @@
                         <select name="status" form="exam-form-@exam.Id">
                             @foreach (var status in Enum.GetValues<ExamStatus>())
                             {
-                                <option value="@status" selected="@(status == exam.Status)">@status</option>
+                                <option value="@status" selected="@(status == exam.Status)">@Labels.Of(status)</option>
                             }
                         </select>
                     </td>

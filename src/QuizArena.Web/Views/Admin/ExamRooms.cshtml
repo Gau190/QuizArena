@@ -7,7 +7,7 @@
     <div class="feature-head">
         <div>
             <h1>Nhóm thi & Phòng thi</h1>
-            <p>Chia học sinh thành ca thi, phòng thi và phân công giám thị cho từng kỳ thi.</p>
+            <p>Chia thí sinh thành ca thi, phòng thi và phân công giám thị cho từng kỳ thi.</p>
         </div>
         <div class="head-actions">
             <form method="post" asp-action="AutoAssignExamRooms">
@@ -29,7 +29,7 @@
             <option value="">Chọn kỳ thi</option>
             @foreach (var exam in Model.Exams)
             {
-                <option value="@exam.Id">@exam.Title</option>
+                <option value="@exam.Id">@System.Net.WebUtility.HtmlDecode(exam.Title)</option>
             }
         </select>
         <select name="classId" required>
@@ -75,7 +75,7 @@
                         <select name="examId" form="room-form-@room.Id">
                             @foreach (var exam in Model.Exams)
                             {
-                                <option value="@exam.Id" selected="@(exam.Id == room.ExamId)">@exam.Title</option>
+                                <option value="@exam.Id" selected="@(exam.Id == room.ExamId)">@System.Net.WebUtility.HtmlDecode(exam.Title)</option>
                             }
                         </select>
                     </td>

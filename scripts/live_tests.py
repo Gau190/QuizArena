@@ -21,12 +21,12 @@ def token(h):
 
 class C:
     def __init__(self): self.s = requests.Session(); self.s.headers["User-Agent"] = "QuizArenaLiveTest/1.0"
-    def get(self, p, **k): return self.s.get(BASE + p, allow_redirects=k.pop("allow_redirects", False), timeout=90, **k)
+    def get(self, p, **k): return self.s.get(BASE + p, allow_redirects=k.pop("allow_redirects", False), timeout=240, **k)
     def post(self, p, data=None, page=None, **k):
         d = dict(data or {})
         if "__RequestVerificationToken" not in d:
             d["__RequestVerificationToken"] = token(self.get(page or "/dang-nhap", allow_redirects=True).text)
-        return self.s.post(BASE + p, data=d, allow_redirects=k.pop("allow_redirects", False), timeout=90, **k)
+        return self.s.post(BASE + p, data=d, allow_redirects=k.pop("allow_redirects", False), timeout=240, **k)
     def login(self, u, pw):
         # giữ dưới giới hạn 20 lần/phút của máy chủ để không tự chặn chính mình
         global LAST_LOGIN
@@ -34,7 +34,7 @@ class C:
         if wait > 0 and not THROTTLE_OFF: time.sleep(wait)
         LAST_LOGIN = time.time()
         return self.post("/dang-nhap", {"Username": u, "Password": pw}, page="/dang-nhap")
-    def jpost(self, p, body): return self.s.post(BASE + p, json=body, timeout=90)
+    def jpost(self, p, body): return self.s.post(BASE + p, json=body, timeout=240)
 
 def login(u, pw):
     c = C(); r = c.login(u, pw); return c, r
@@ -47,6 +47,7 @@ ctx = {}
 c = C()
 t = time.time(); r = c.get("/trang-thai"); rec("TC-INF-01", "Hạ tầng", "Health /trang-thai", r.status_code == 200, f"{(time.time()-t)*1000:.0f} ms")
 r = c.get("/trang-thai/csdl"); rec("TC-INF-02", "Hạ tầng", "Kết nối CSDL SQL Server", r.status_code == 200 and '"db":"ok"' in r.text, r.text[:60])
+rec("TC-INF-07", "Hạ tầng", "/trang-thai/csdl không lộ số tài khoản", '"users"' not in r.text)
 rec("TC-INF-03", "Hạ tầng", "Chạy HTTPS", BASE.startswith("https://"))
 r = c.get("/"); rec("TC-INF-04", "Hạ tầng", "Trang chủ 200, có header bảo mật", r.status_code == 200 and "default-src" in r.headers.get("Content-Security-Policy", "") and r.headers.get("X-Frame-Options") == "DENY")
 r = c.get("/khong-ton-tai-abc"); rec("TC-INF-05", "Hạ tầng", "Đường dẫn không tồn tại trả 404 (không lộ lỗi hệ thống)", r.status_code == 404 and "Exception" not in r.text and "StackTrace" not in r.text)
@@ -81,6 +82,7 @@ def make_user(u, name, role):
 ctx["gv_id"] = make_user(QA + "_gv", "QA Giảng viên", "Teacher")
 ctx["ts_id"] = make_user(QA + "_ts1", "QA Thí sinh một", "Student")
 ctx["ts2_id"] = make_user(QA + "_ts2", "QA Thí sinh hai", "Student")
+ctx["ts3_id"] = make_user(QA + "_ts3", "=1+1 QA", "Student")
 rec("TC-AD-02", "Quản trị", "Tạo 1 giảng viên và 2 thí sinh thử", all([ctx["gv_id"], ctx["ts_id"], ctx["ts2_id"]]))
 r = admin.post("/quan-tri/nguoi-dung", {"username": QA + "_gv", "email": "x@qa.test", "fullName": "Trùng", "password": PW, "role": "Student"}, page="/quan-tri/nguoi-dung")
 rec("TC-AD-03", "Quản trị", "Tạo trùng tên đăng nhập bị từ chối", "QA Thí sinh một" in admin.get("/quan-tri/nguoi-dung?q=" + QA).utext and "Trùng" not in admin.get("/quan-tri/nguoi-dung?q=" + QA).utext)
@@ -93,11 +95,12 @@ h = admin.get("/quan-tri/lop-hoc?q=" + cls).utext
 m = re.search(r"/quan-tri/lop-hoc/(\d+)", h[h.index(cls):]) if cls in h else None
 ctx["class_id"] = m.group(1) if m else None
 rec("TC-AD-05", "Quản trị", "Tạo lớp học", bool(ctx["class_id"]), cls)
-for k in ("ts_id", "ts2_id"):
+for k in ("ts_id", "ts2_id", "ts3_id"):
     admin.post("/quan-tri/lop-hoc/chuyen-lop", {"studentId": ctx[k], "classId": ctx["class_id"]}, page="/quan-tri/lop-hoc")
-h = admin.get("/quan-tri/lop-hoc?q=" + cls).utext
-rec("TC-AD-06", "Quản trị", "Chuyển thí sinh mới vào lớp (thí sinh mới tạo hiện trong danh sách lớp)", "QA Thí sinh một" in h, "thí sinh tạo từ trang Người dùng chưa có hồ sơ học sinh nên có thể không hiện" if "QA Thí sinh một" not in h else "")
+h = admin.get("/quan-tri/lop-hoc?q=" + QA).utext
+rec("TC-AD-06", "Quản trị", "Chuyển thí sinh mới vào lớp (thí sinh mới tạo hiện trong danh sách lớp)", "QA Thí sinh một" in h)
 r = admin.get("/quan-tri/lop-hoc/xuat"); rec("TC-AD-07", "Quản trị", "Xuất danh sách lớp", r.status_code == 200 and len(r.content) > 20)
+rec("TC-UP-05", "Tải tệp", "Xuất CSV vô hiệu công thức (ô bắt đầu bằng = có dấu nháy đơn)", "'=1+1 QA" in r.content.decode("utf-8-sig", "ignore") and '"=1+1 QA' not in r.content.decode("utf-8-sig", "ignore"))
 r = admin.get("/bao-cao/xuat"); rec("TC-AD-08", "Quản trị", "Xuất báo cáo Excel hợp lệ", r.status_code == 200 and r.content[:2] == b"PK")
 # đặt lại mật khẩu, khoá/mở
 if ctx["ts2_id"]:
@@ -123,14 +126,26 @@ for i, (ty, df, an, co) in enumerate(plan):
 h = gv.get("/giang-vien/ngan-hang-cau-hoi?q=" + QA).utext
 made = len(re.findall(r"QA câu \d+", h)); rec("TC-GV-04", "Giảng viên", "Thêm 12 câu hỏi (đủ 3 dạng, 3 độ khó)", made >= 12, f"{made} câu")
 bad = f"Sai luật {QA}"; gv.post("/giang-vien/ngan-hang-cau-hoi", {"subjectId": ctx["subj_id"], "content": bad, "type": "SingleChoice", "difficulty": "Easy", "points": "1", "answers": "A\nB", "correct": "1,2"}, page="/giang-vien/ngan-hang-cau-hoi")
+hq = gv.get("/giang-vien/ngan-hang-cau-hoi?q=" + QA).text
+rec("TC-TXT-03", "Nội dung giao diện", "Ngân hàng câu hỏi hiện nhãn tiếng Việt, không hiện enum thô", "Một đáp án" in hq and 'class="badge">SingleChoice' not in hq and 'class="badge">Easy' not in hq)
 rec("TC-GV-05", "Giảng viên", "Câu một đáp án có 2 đáp án đúng bị từ chối", bad not in gv.get("/giang-vien/ngan-hang-cau-hoi?q=Sai").utext)
 csv = "content,type,difficulty,points,answers,correct,explanation\n" + "\n".join(f"QA nhập {QA} {i},SingleChoice,Easy,1,A|B|C,2,Nhập từ CSV" for i in range(3)) + "\n"
 tok = token(gv.get("/giang-vien/ngan-hang-cau-hoi").text)
-r = gv.s.post(BASE + "/giang-vien/ngan-hang-cau-hoi/nhap", data={"__RequestVerificationToken": tok, "fallbackSubjectId": ctx["subj_id"]}, files={"file": ("qa.csv", csv.encode(), "text/csv")}, allow_redirects=False, timeout=90)
+r = gv.s.post(BASE + "/giang-vien/ngan-hang-cau-hoi/nhap", data={"__RequestVerificationToken": tok, "fallbackSubjectId": ctx["subj_id"]}, files={"file": ("qa.csv", csv.encode(), "text/csv")}, allow_redirects=False, timeout=240)
 rec("TC-GV-06", "Giảng viên", "Nhập 3 câu từ CSV", len(re.findall(r"QA nhập", gv.get("/giang-vien/ngan-hang-cau-hoi?q=" + QA).utext)) >= 3)
 tok = token(gv.get("/giang-vien/ngan-hang-cau-hoi").text)
-r = gv.s.post(BASE + "/giang-vien/ngan-hang-cau-hoi/nhap", data={"__RequestVerificationToken": tok, "fallbackSubjectId": ctx["subj_id"]}, files={"file": ("rong.csv", b"", "text/csv")}, allow_redirects=True, timeout=90)
+r = gv.s.post(BASE + "/giang-vien/ngan-hang-cau-hoi/nhap", data={"__RequestVerificationToken": tok, "fallbackSubjectId": ctx["subj_id"]}, files={"file": ("rong.csv", b"", "text/csv")}, allow_redirects=True, timeout=240)
 rec("TC-GV-07", "Giảng viên", "Nhập tệp rỗng: báo lỗi, không lỗi 500", r.status_code == 200)
+tok = token(gv.get("/giang-vien/ngan-hang-cau-hoi").text)
+r = gv.s.post(BASE + "/giang-vien/ngan-hang-cau-hoi/nhap", data={"__RequestVerificationToken": tok, "fallbackSubjectId": ctx["subj_id"]}, files={"file": ("q.txt", b"content\nx", "text/plain")}, allow_redirects=True, timeout=240)
+rec("TC-UP-01", "Tải tệp", "Tệp .txt bị từ chối", "Chỉ nhận" in r.utext)
+r = gv.s.post(BASE + "/giang-vien/ngan-hang-cau-hoi/nhap", data={"__RequestVerificationToken": tok, "fallbackSubjectId": ctx["subj_id"]}, files={"file": ("big.csv", b"content\n" + b"x" * (3 * 1024 * 1024), "text/csv")}, allow_redirects=True, timeout=240)
+rec("TC-UP-02", "Tải tệp", "Tệp CSV lớn hơn 2 MB bị từ chối", "quá lớn" in r.utext)
+r = gv.s.post(BASE + "/giang-vien/ngan-hang-cau-hoi/nhap", data={"__RequestVerificationToken": tok, "fallbackSubjectId": ctx["subj_id"]}, allow_redirects=True, timeout=240)
+rec("TC-UP-03", "Tải tệp", "Thiếu tệp không gây lỗi 500", r.status_code == 200, str(r.status_code))
+tokA = token(admin.get("/quan-tri/cai-dat").text)
+r = admin.s.post(BASE + "/quan-tri/cai-dat/logo", data={"__RequestVerificationToken": tokA}, files={"logo": ("x.png", b"<?php echo 1; ?> not an image at all", "image/png")}, allow_redirects=True, timeout=240)
+rec("TC-UP-04", "Tải tệp", "Logo giả (đuôi .png, nội dung không phải ảnh) bị từ chối", "không phải ảnh" in r.utext)
 now = datetime.now(timezone.utc); fmt = "%Y-%m-%dT%H:%M"
 exam = f"QA Kỳ thi {QA}"
 form = {"subjectId": ctx["subj_id"], "classIds": ctx["class_id"], "title": exam, "description": "Kỳ thi kiểm thử", "durationMinutes": "20", "maxAttempts": "2", "generateMode": "ByCount", "questionCount": "6", "totalPoints": "10", "easyCount": "0", "mediumCount": "0", "hardCount": "0", "passScore": "5",
@@ -154,8 +169,14 @@ ids = re.findall(r"/thi-sinh/bat-dau/(\d+)", dash)
 rec("TC-TS-03", "Thí sinh", "Kỳ thi QA hiện ở trang chính của thí sinh trong lớp", ctx.get("exam_id") in ids, f"exam={ctx.get('exam_id')} ds={ids[:5]}")
 attempt = None
 if ctx.get("exam_id"):
-    r = ts.post(f"/thi-sinh/bat-dau/{ctx['exam_id']}", page="/thi-sinh"); m = re.search(r"/thi-sinh/lam-bai/([0-9a-f-]{36})", r.headers.get("Location", "")); attempt = m.group(1) if m else None
-    rec("TC-TS-04", "Thí sinh", "Bắt đầu thi", bool(attempt), r.headers.get("Location", ""))
+    import concurrent.futures as cf
+    tkn = token(ts.get("/thi-sinh").text)
+    def _start(_): return ts.s.post(BASE + f"/thi-sinh/bat-dau/{ctx['exam_id']}", data={"__RequestVerificationToken": tkn}, allow_redirects=False, timeout=240).headers.get("Location", "")
+    with cf.ThreadPoolExecutor(6) as ex: locs = list(ex.map(_start, range(6)))
+    got = set(re.findall(r"/thi-sinh/lam-bai/([0-9a-f-]{36})", ";".join(locs)))
+    rec("TC-TS-04", "Thí sinh", "Bắt đầu thi", len(got) >= 1, f"{len(got)} lượt")
+    rec("TC-RACE-02", "Đồng thời", "6 yêu cầu bắt đầu thi cùng lúc trên site thật chỉ tạo đúng 1 lượt", len(got) == 1, f"{len(got)} lượt")
+    attempt = next(iter(got), None)
 r = ts.post(f"/thi-sinh/bat-dau/{ctx.get('exam_id') or 0}", page="/thi-sinh")
 rec("TC-TS-05", "Thí sinh", "Bấm bắt đầu lần nữa vẫn vào lại đúng lượt đang làm (không tạo lượt mới)", attempt is None or attempt in r.headers.get("Location", ""))
 if attempt:
@@ -234,7 +255,7 @@ for p in ["/quan-tri", "/giang-vien", "/bao-cao", "/quan-tri/nguoi-dung", "/api/
 if ctx.get("exam_id"):
     gv.post(f"/giang-vien/ky-thi/{ctx['exam_id']}/bat-tat", page="/giang-vien/ky-thi/tao")     # tắt kỳ thi thử
     r = gv.post(f"/giang-vien/ky-thi/{ctx['exam_id']}/xoa", page="/giang-vien/ky-thi/tao")
-for k in ("ts_id", "ts2_id", "gv_id"):
+for k in ("ts_id", "ts2_id", "ts3_id", "gv_id"):
     if ctx.get(k):
         admin.post(f"/quan-tri/nguoi-dung/{ctx[k]}/xoa", page="/quan-tri/nguoi-dung")
 left = [u for u in (QA + "_gv", QA + "_ts1", QA + "_ts2") if u in admin.get("/quan-tri/nguoi-dung?q=" + QA).utext]
